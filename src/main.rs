@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 pub struct Table {
+    fields: HashMap<&'static str, &'static str>,
     table_view: TableView,
 }
 
