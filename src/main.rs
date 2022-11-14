@@ -1,8 +1,10 @@
 use std::collections::HashMap;
+use std::io::{Stdout, Write};
 
-pub struct Table {
-    fields: HashMap<&'static str, &'static str>,
+pub struct Table<T: Write> {
+    fields: HashMap<String, String>,
     table_view: TableView,
+    handle: T,
 }
 
 pub struct TableView {
@@ -42,6 +44,45 @@ impl Default for TableView {
             mid: "─".to_string(),
             mid_mid: "┼".to_string(),
         }
+    }
+}
+
+impl Table<Stdout> {
+    /// Create a new ProgressBar with default configuration.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::thread;
+    /// use pbr::{ProgressBar, Units};
+    ///
+    /// let count = 1000;
+    /// let mut pb = ProgressBar::new(count);
+    /// pb.set_units(Units::Bytes);
+    ///
+    /// for _ in 0..count {
+    ///    pb.inc();
+    ///    thread::sleep_ms(100);
+    /// }
+    /// ```
+    pub fn new() -> Table<Stdout> {
+        let handle = ::std::io::stdout();
+        Table::on(handle)
+    }
+}
+
+impl<T: Write> Table<T> {
+    pub fn on(handle: T) -> Table<T> {
+        Self {
+            fields: HashMap::new(),
+            table_view: TableView::default(),
+            handle
+        }
+    }
+
+    pub fn add_field(&mut self, field_key: &str, field_name: &str) {
+        self.fields.insert("name".to_string(), field_name.to_string());
+        self.fields.insert("key".to_string(), field_key.to_string());
     }
 }
 
