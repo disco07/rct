@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::io::{Stdout, Write};
 
 pub struct Table<T: Write> {
-    fields: HashMap<String, String>,
+    fields: HashMap<String, HashMap<String, String>>,
     table_view: TableView,
     handle: T,
 }
@@ -81,8 +81,14 @@ impl<T: Write> Table<T> {
     }
 
     pub fn add_field(&mut self, field_key: &str, field_name: &str) {
-        self.fields.insert("name".to_string(), field_name.to_string());
-        self.fields.insert("key".to_string(), field_key.to_string());
+        self.fields.insert(field_key.to_string(), HashMap::from([
+            ("name".to_string(), field_name.to_string()),
+            ("key".to_string(), field_key.to_string()),
+        ]));
+    }
+
+    fn create_table() {
+
     }
 }
 
