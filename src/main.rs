@@ -24,6 +24,7 @@ macro_rules! printfl {
 pub struct Table<T: Write> {
     fields: BTreeMap<u32, HashMap<String, String>>,
     table_view: TableView,
+    data: Vec<BTreeMap<u32, String>>,
     handle: T,
 }
 
@@ -87,7 +88,7 @@ impl Table<Stdout> {
     /// }
     /// ```
     pub fn new() -> Table<Stdout> {
-        let handle = ::std::io::stdout();
+        let handle = std::io::stdout();
         Table::on(handle)
     }
 }
@@ -97,8 +98,13 @@ impl<T: Write> Table<T> {
         Self {
             fields: BTreeMap::new(),
             table_view: TableView::default(),
+            data: vec![],
             handle,
         }
+    }
+
+    pub fn add_data(&mut self, data: Vec<BTreeMap<u32, String>>) {
+        self.data = data;
     }
 
     pub fn add_field(&mut self, field_key: u32, field_name: &str) {
@@ -112,12 +118,13 @@ impl<T: Write> Table<T> {
     }
 
     fn create_table(&self) -> String {
-        let mut header_data: HashMap<u32, String> = HashMap::new();
+        let mut header: HashMap<u32, String> = HashMap::new();
         let mut column_len: HashMap<u32, u32> = HashMap::new();
+        let mut cell: Vec<HashMap<u32, String>> = vec![];
         let mut table: String = String::new();
 
         for field in self.fields.iter() {
-            header_data.insert(
+            header.insert(
                 *field.0,
                 field.1.get("name").unwrap().to_string(),
             );
@@ -135,9 +142,28 @@ impl<T: Write> Table<T> {
             );
         }
 
+        if self.data.len() > 0 {
+            for data in self.data.iter() {
+                for c in data {
+                    cell.push(HashMap::from([(*c.0, c.1.to_string())]));
+                    column_len.insert(
+                        *c.0,
+                        max(
+                            *column_len.get(c.0).unwrap(),
+                            c.1.to_string().len() as u32,
+                        ),
+                    );
+                }
+            }
+        }
+
         table += &self.print_table_top(&column_len);
-        table += &self.print_table_row(header_data, &column_len);
+        table += &self.print_table_row(header, &column_len);
         table += &self.print_table_middle(&column_len);
+
+        for c in cell {
+            table += &self.print_table_row(c, &column_len);
+        }
 
         table
     }
@@ -173,12 +199,12 @@ impl<T: Write> Table<T> {
         table += &self.table_view.left;
         for row in rows {
             count += 1;
-
+            println!("{:?}", &row);
             if space_count == 0 && count == 1 {
                 table += &" ".repeat(1);
             }
             table += &row.1.trim();
-            table += &" ".repeat(1);
+            table += &" ".repeat((*column_len.get(&row.0).unwrap() - row.1.len() as u32 +1) as usize);
 
             if column_len.len() > count {
                 table += &self.table_view.middle;
@@ -219,12 +245,28 @@ impl<T: Write> Table<T> {
 
 fn main() {
     let mut table = Table::new();
+    let mut data: Vec<BTreeMap<u32, String>> = vec![];;
+    data.push(BTreeMap::from([
+        (1, "Drissa".to_string()),
+        (2, "Kone".to_string()),
+        (3, "07th April 1991".to_string()),
+        (4, "Yes".to_string()),
+        (5, "10 minutes".to_string()),
+    ]));
+    data.push(BTreeMap::from([
+        (1, "Yaya".to_string()),
+        (2, "Kone".to_string()),
+        (3, "07th April 1991".to_string()),
+        (4, "No".to_string()),
+        (5, "9 minutes".to_string()),
+    ]));
 
     table.add_field(1, "First Name");
     table.add_field(2, "Last Name");
     table.add_field(3, "DOB");
     table.add_field(4, "Admin");
     table.add_field(5, "Last Seen");
+    table.add_data(data);
 
     table.view()
 }
