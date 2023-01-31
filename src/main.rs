@@ -1,5 +1,24 @@
+use std::cmp::max;
 use std::collections::HashMap;
 use std::io::{Stdout, Write};
+
+// Macro for writing to the giving writer.
+// Used in both pb.rs and multi.rs modules.
+//
+// # Examples
+//
+// ```
+// let w = io::stdout();
+// printfl!(w, "");
+// printfl!(w, "\r{}", out);
+//
+// ```
+macro_rules! printfl {
+   ($w:expr, $($tt:tt)*) => {{
+        $w.write_all(&format!($($tt)*).as_bytes()).ok().expect("write() fail");
+        $w.flush().ok().expect("flush() fail");
+    }}
+}
 
 pub struct Table<T: Write> {
     fields: HashMap<String, HashMap<String, String>>,
@@ -87,11 +106,79 @@ impl<T: Write> Table<T> {
         ]));
     }
 
-    fn create_table() {
+    fn create_table(&self) -> String {
+        let mut header_data = HashMap::new();
+        let mut column_len: HashMap<String, u32> = HashMap::new();
 
+        let mut table: String = String::new();
+
+        for field in self.fields.iter() {
+            header_data.insert(field.0.to_string(), field.1.get("name").unwrap().to_string());
+
+            match column_len.get(field.0) {
+                None => column_len.insert(field.0.to_string(), 0),
+                Some(_) => None
+            };
+            column_len.insert(field.0.to_string(), max(*column_len.get(field.0).unwrap(), field.1.get("name").unwrap().to_string().len() as u32));
+        }
+
+        table += &self.print_table_top(&column_len);
+        table += &self.print_table_row(header_data, &column_len);
+
+        table
+    }
+
+    fn print_table_top(&self, column_len: &HashMap<String, u32>) -> String {
+        let mut table: String = String::new();
+        let mut count = 0;
+
+        table += &self.table_view.top_left;
+        for len in column_len.iter() {
+            count += 1;
+            table += &self.table_view.top.repeat(*len.1 as usize);
+            if column_len.len() > count {
+                table += &self.table_view.top_mid;
+            }
+        }
+        table += &self.table_view.top_right;
+        table += "\n";
+
+        table
+    }
+
+    fn print_table_row(&self, rows: HashMap<String, String>, column_len: &HashMap<String, u32>) -> String {
+        let mut table: String = String::new();
+        let mut count = 0;
+        table += &self.table_view.left;
+        for row in rows {
+            count += 1;
+
+            table += &row.0;
+
+            for _i in row.1.len()..(*column_len.get(&row.0).unwrap() as usize) {
+                table += " ";
+            }
+
+            if column_len.len() > count {
+                table += &self.table_view.middle;
+            }
+        }
+        table += &self.table_view.right;
+        table += "\n";
+
+        table
+    }
+
+    pub fn view(&mut self) {
+        printfl!(self.handle, "\r{}", self.create_table());
     }
 }
 
 fn main() {
-    println!("Hello, world!");
+    let mut table = Table::new();
+
+    table.add_field("First Name", "firstName");
+    table.add_field("Last Name", "lastName");
+
+    table.view()
 }
