@@ -1,5 +1,5 @@
 use std::cmp::max;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::io::{Stdout, Write};
 
 // Macro for writing to the giving writer.
@@ -95,31 +95,43 @@ impl<T: Write> Table<T> {
         Self {
             fields: HashMap::new(),
             table_view: TableView::default(),
-            handle
+            handle,
         }
     }
 
     pub fn add_field(&mut self, field_key: &str, field_name: &str) {
-        self.fields.insert(field_key.to_string(), HashMap::from([
-            ("name".to_string(), field_name.to_string()),
-            ("key".to_string(), field_key.to_string()),
-        ]));
+        self.fields.insert(
+            field_key.to_string(),
+            HashMap::from([
+                ("name".to_string(), field_name.to_string()),
+                ("key".to_string(), field_key.to_string()),
+            ]),
+        );
     }
 
     fn create_table(&self) -> String {
-        let mut header_data = HashMap::new();
+        let mut header_data: HashMap<String, String> = HashMap::new();
         let mut column_len: HashMap<String, u32> = HashMap::new();
 
         let mut table: String = String::new();
 
         for field in self.fields.iter() {
-            header_data.insert(field.0.to_string(), field.1.get("name").unwrap().to_string());
+            header_data.insert(
+                field.0.to_string(),
+                field.1.get("name").unwrap().to_string(),
+            );
 
             match column_len.get(field.0) {
                 None => column_len.insert(field.0.to_string(), 0),
-                Some(_) => None
+                Some(_) => None,
             };
-            column_len.insert(field.0.to_string(), max(*column_len.get(field.0).unwrap(), field.1.get("name").unwrap().to_string().len() as u32));
+            column_len.insert(
+                field.0.to_string(),
+                max(
+                    *column_len.get(field.0).unwrap(),
+                    field.1.get("name").unwrap().to_string().len() as u32,
+                ),
+            );
         }
 
         table += &self.print_table_top(&column_len);
@@ -129,13 +141,14 @@ impl<T: Write> Table<T> {
     }
 
     fn print_table_top(&self, column_len: &HashMap<String, u32>) -> String {
+        let fields: BTreeMap<_, _> = column_len.into_iter().collect();
         let mut table: String = String::new();
         let mut count = 0;
 
         table += &self.table_view.top_left;
-        for len in column_len.iter() {
+        for len in fields.iter() {
             count += 1;
-            table += &self.table_view.top.repeat(*len.1 as usize);
+            table += &self.table_view.top.repeat((**len.1 as usize) + 2);
             if column_len.len() > count {
                 table += &self.table_view.top_mid;
             }
@@ -146,22 +159,29 @@ impl<T: Write> Table<T> {
         table
     }
 
-    fn print_table_row(&self, rows: HashMap<String, String>, column_len: &HashMap<String, u32>) -> String {
+    fn print_table_row(
+        &self,
+        fields: HashMap<String, String>,
+        column_len: &HashMap<String, u32>,
+    ) -> String {
         let mut table: String = String::new();
         let mut count = 0;
+        let mut space_count = 0;
+        let rows: BTreeMap<_, _> = fields.into_iter().collect();
         table += &self.table_view.left;
         for row in rows {
             count += 1;
 
-            table += &row.0;
-
-            for _i in row.1.len()..(*column_len.get(&row.0).unwrap() as usize) {
-                table += " ";
+            if space_count == 0 && count == 1 {
+                table += &" ".repeat(1);
             }
+            table += &row.1.trim();
+            table += &" ".repeat(1);
 
             if column_len.len() > count {
                 table += &self.table_view.middle;
             }
+            space_count = 1;
         }
         table += &self.table_view.right;
         table += "\n";
@@ -177,8 +197,11 @@ impl<T: Write> Table<T> {
 fn main() {
     let mut table = Table::new();
 
-    table.add_field("First Name", "firstName");
-    table.add_field("Last Name", "lastName");
+    table.add_field("firstName", "First Name");
+    table.add_field("lastName", "Last Name");
+    table.add_field("dobTime", "DOB");
+    table.add_field("isAdmin", "Admin");
+    table.add_field("lastSeenTime", "Last Seen");
 
     table.view()
 }
