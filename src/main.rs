@@ -20,12 +20,15 @@ macro_rules! printfl {
     }}
 }
 
+#[derive(Clone)]
 pub struct Table<T: Write> {
-    fields: HashMap<String, HashMap<String, String>>,
+    fields: BTreeMap<u32, HashMap<String, String>>,
     table_view: TableView,
+    data: Vec<BTreeMap<u32, String>>,
     handle: T,
 }
 
+#[derive(Clone)]
 pub struct TableView {
     top: String,
     top_mid: String,
@@ -85,7 +88,7 @@ impl Table<Stdout> {
     /// }
     /// ```
     pub fn new() -> Table<Stdout> {
-        let handle = ::std::io::stdout();
+        let handle = std::io::stdout();
         Table::on(handle)
     }
 }
@@ -93,40 +96,42 @@ impl Table<Stdout> {
 impl<T: Write> Table<T> {
     pub fn on(handle: T) -> Table<T> {
         Self {
-            fields: HashMap::new(),
+            fields: BTreeMap::new(),
             table_view: TableView::default(),
+            data: vec![],
             handle,
         }
     }
 
-    pub fn add_field(&mut self, field_key: &str, field_name: &str) {
+    pub fn add_data(&mut self, data: Vec<BTreeMap<u32, String>>) {
+        self.data = data;
+    }
+
+    pub fn add_field(&mut self, field_key: u32, field_name: &str) {
         self.fields.insert(
-            field_key.to_string(),
+            field_key,
             HashMap::from([
-                ("name".to_string(), field_name.to_string()),
                 ("key".to_string(), field_key.to_string()),
+                ("name".to_string(), field_name.to_string()),
             ]),
         );
     }
 
     fn create_table(&self) -> String {
-        let mut header_data: HashMap<String, String> = HashMap::new();
-        let mut column_len: HashMap<String, u32> = HashMap::new();
-
+        let mut header: HashMap<u32, String> = HashMap::new();
+        let mut column_len: HashMap<u32, u32> = HashMap::new();
+        let mut cell: Vec<HashMap<u32, String>> = vec![];
         let mut table: String = String::new();
 
         for field in self.fields.iter() {
-            header_data.insert(
-                field.0.to_string(),
-                field.1.get("name").unwrap().to_string(),
-            );
+            header.insert(*field.0, field.1.get("name").unwrap().to_string());
 
             match column_len.get(field.0) {
-                None => column_len.insert(field.0.to_string(), 0),
+                None => column_len.insert(*field.0, 0),
                 Some(_) => None,
             };
             column_len.insert(
-                field.0.to_string(),
+                *field.0,
                 max(
                     *column_len.get(field.0).unwrap(),
                     field.1.get("name").unwrap().to_string().len() as u32,
@@ -134,13 +139,37 @@ impl<T: Write> Table<T> {
             );
         }
 
+        if self.data.len() > 0 {
+            for data in self.data.iter() {
+                cell.push(HashMap::from_iter(data.to_owned()));
+                for c in data {
+                    column_len.insert(
+                        *c.0,
+                        max(*column_len.get(c.0).unwrap(), c.1.to_string().len() as u32),
+                    );
+                }
+            }
+        }
+
         table += &self.print_table_top(&column_len);
-        table += &self.print_table_row(header_data, &column_len);
+        table += &self.print_table_row(header, &column_len);
+        table += &self.print_table_middle(&column_len);
+
+        let mut count = 0;
+        for i in 0..cell.len() {
+            count += 1;
+            table += &self.print_table_row(cell.get(i).unwrap().to_owned(), &column_len);
+            if cell.len() > count {
+                table += &self.print_table_middle(&column_len);
+            } else {
+                table += &self.print_table_bottom(&column_len);
+            }
+        }
 
         table
     }
 
-    fn print_table_top(&self, column_len: &HashMap<String, u32>) -> String {
+    fn print_table_top(&self, column_len: &HashMap<u32, u32>) -> String {
         let fields: BTreeMap<_, _> = column_len.into_iter().collect();
         let mut table: String = String::new();
         let mut count = 0;
@@ -161,8 +190,8 @@ impl<T: Write> Table<T> {
 
     fn print_table_row(
         &self,
-        fields: HashMap<String, String>,
-        column_len: &HashMap<String, u32>,
+        fields: HashMap<u32, String>,
+        column_len: &HashMap<u32, u32>,
     ) -> String {
         let mut table: String = String::new();
         let mut count = 0;
@@ -176,7 +205,8 @@ impl<T: Write> Table<T> {
                 table += &" ".repeat(1);
             }
             table += &row.1.trim();
-            table += &" ".repeat(1);
+            table +=
+                &" ".repeat((*column_len.get(&row.0).unwrap() - row.1.len() as u32 + 1) as usize);
 
             if column_len.len() > count {
                 table += &self.table_view.middle;
@@ -189,6 +219,43 @@ impl<T: Write> Table<T> {
         table
     }
 
+    fn print_table_middle(&self, column_len: &HashMap<u32, u32>) -> String {
+        let mut table: String = String::new();
+        let fields: BTreeMap<_, _> = column_len.into_iter().collect();
+        let mut count = 0;
+        table += &self.table_view.left_mid;
+        for len in fields.iter() {
+            count += 1;
+            table += &self.table_view.mid.repeat((**len.1 as usize) + 2);
+            if column_len.len() > count {
+                table += &self.table_view.mid_mid;
+            }
+        }
+        table += &self.table_view.right_mid;
+        table += "\n";
+
+        table
+    }
+
+    fn print_table_bottom(&self, column_len: &HashMap<u32, u32>) -> String {
+        let fields: BTreeMap<_, _> = column_len.into_iter().collect();
+        let mut table: String = String::new();
+        let mut count = 0;
+
+        table += &self.table_view.bottom_left;
+        for len in fields.iter() {
+            count += 1;
+            table += &self.table_view.bottom.repeat((**len.1 as usize) + 2);
+            if column_len.len() > count {
+                table += &self.table_view.bottom_mid;
+            }
+        }
+        table += &self.table_view.bottom_right;
+        table += "\n";
+
+        table
+    }
+
     pub fn view(&mut self) {
         printfl!(self.handle, "\r{}", self.create_table());
     }
@@ -196,12 +263,28 @@ impl<T: Write> Table<T> {
 
 fn main() {
     let mut table = Table::new();
+    let mut data: Vec<BTreeMap<u32, String>> = vec![];
+    data.push(BTreeMap::from([
+        (1, "Drissa".to_string()),
+        (2, "Kone".to_string()),
+        (3, "07th April 1991".to_string()),
+        (4, "Yes".to_string()),
+        (5, "10 minutes".to_string()),
+    ]));
+    data.push(BTreeMap::from([
+        (1, "Yaya".to_string()),
+        (2, "Kone".to_string()),
+        (3, "07th April 1991".to_string()),
+        (4, "No".to_string()),
+        (5, "9 minutes".to_string()),
+    ]));
 
-    table.add_field("firstName", "First Name");
-    table.add_field("lastName", "Last Name");
-    table.add_field("dobTime", "DOB");
-    table.add_field("isAdmin", "Admin");
-    table.add_field("lastSeenTime", "Last Seen");
+    table.add_field(1, "First Name");
+    table.add_field(2, "Last Name");
+    table.add_field(3, "DOB");
+    table.add_field(4, "Admin");
+    table.add_field(5, "Last Seen");
+    table.add_data(data);
 
     table.view()
 }
