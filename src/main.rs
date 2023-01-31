@@ -137,6 +137,7 @@ impl<T: Write> Table<T> {
 
         table += &self.print_table_top(&column_len);
         table += &self.print_table_row(header_data, &column_len);
+        table += &self.print_table_middle(&column_len);
 
         table
     }
@@ -185,6 +186,27 @@ impl<T: Write> Table<T> {
             space_count = 1;
         }
         table += &self.table_view.right;
+        table += "\n";
+
+        table
+    }
+
+    fn print_table_middle(
+        &self,
+        column_len: &HashMap<u32, u32>,
+    ) -> String {
+        let mut table: String = String::new();
+        let fields: BTreeMap<_, _> = column_len.into_iter().collect();
+        let mut count = 0;
+        table += &self.table_view.left_mid;
+        for len in fields.iter() {
+            count += 1;
+            table += &self.table_view.mid.repeat((**len.1 as usize) + 2);
+            if column_len.len() > count {
+                table += &self.table_view.mid_mid;
+            }
+        }
+        table += &self.table_view.right_mid;
         table += "\n";
 
         table
