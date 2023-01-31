@@ -124,10 +124,7 @@ impl<T: Write> Table<T> {
         let mut table: String = String::new();
 
         for field in self.fields.iter() {
-            header.insert(
-                *field.0,
-                field.1.get("name").unwrap().to_string(),
-            );
+            header.insert(*field.0, field.1.get("name").unwrap().to_string());
 
             match column_len.get(field.0) {
                 None => column_len.insert(*field.0, 0),
@@ -148,10 +145,7 @@ impl<T: Write> Table<T> {
                 for c in data {
                     column_len.insert(
                         *c.0,
-                        max(
-                            *column_len.get(c.0).unwrap(),
-                            c.1.to_string().len() as u32,
-                        ),
+                        max(*column_len.get(c.0).unwrap(), c.1.to_string().len() as u32),
                     );
                 }
             }
@@ -161,9 +155,15 @@ impl<T: Write> Table<T> {
         table += &self.print_table_row(header, &column_len);
         table += &self.print_table_middle(&column_len);
 
+        let mut count = 0;
         for i in 0..cell.len() {
+            count += 1;
             table += &self.print_table_row(cell.get(i).unwrap().to_owned(), &column_len);
-            table += &self.print_table_middle(&column_len);
+            if cell.len() > count {
+                table += &self.print_table_middle(&column_len);
+            } else {
+                table += &self.print_table_bottom(&column_len);
+            }
         }
 
         table
@@ -200,12 +200,13 @@ impl<T: Write> Table<T> {
         table += &self.table_view.left;
         for row in rows {
             count += 1;
-            // println!("{:?}", &row);
+
             if space_count == 0 && count == 1 {
                 table += &" ".repeat(1);
             }
             table += &row.1.trim();
-            table += &" ".repeat((*column_len.get(&row.0).unwrap() - row.1.len() as u32 +1) as usize);
+            table +=
+                &" ".repeat((*column_len.get(&row.0).unwrap() - row.1.len() as u32 + 1) as usize);
 
             if column_len.len() > count {
                 table += &self.table_view.middle;
@@ -218,10 +219,7 @@ impl<T: Write> Table<T> {
         table
     }
 
-    fn print_table_middle(
-        &self,
-        column_len: &HashMap<u32, u32>,
-    ) -> String {
+    fn print_table_middle(&self, column_len: &HashMap<u32, u32>) -> String {
         let mut table: String = String::new();
         let fields: BTreeMap<_, _> = column_len.into_iter().collect();
         let mut count = 0;
@@ -239,6 +237,25 @@ impl<T: Write> Table<T> {
         table
     }
 
+    fn print_table_bottom(&self, column_len: &HashMap<u32, u32>) -> String {
+        let fields: BTreeMap<_, _> = column_len.into_iter().collect();
+        let mut table: String = String::new();
+        let mut count = 0;
+
+        table += &self.table_view.bottom_left;
+        for len in fields.iter() {
+            count += 1;
+            table += &self.table_view.bottom.repeat((**len.1 as usize) + 2);
+            if column_len.len() > count {
+                table += &self.table_view.bottom_mid;
+            }
+        }
+        table += &self.table_view.bottom_right;
+        table += "\n";
+
+        table
+    }
+
     pub fn view(&mut self) {
         printfl!(self.handle, "\r{}", self.create_table());
     }
@@ -246,7 +263,7 @@ impl<T: Write> Table<T> {
 
 fn main() {
     let mut table = Table::new();
-    let mut data: Vec<BTreeMap<u32, String>> = vec![];;
+    let mut data: Vec<BTreeMap<u32, String>> = vec![];
     data.push(BTreeMap::from([
         (1, "Drissa".to_string()),
         (2, "Kone".to_string()),
