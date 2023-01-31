@@ -144,8 +144,8 @@ impl<T: Write> Table<T> {
 
         if self.data.len() > 0 {
             for data in self.data.iter() {
+                cell.push(HashMap::from_iter(data.to_owned()));
                 for c in data {
-                    cell.push(HashMap::from([(*c.0, c.1.to_string())]));
                     column_len.insert(
                         *c.0,
                         max(
@@ -161,8 +161,9 @@ impl<T: Write> Table<T> {
         table += &self.print_table_row(header, &column_len);
         table += &self.print_table_middle(&column_len);
 
-        for c in cell {
-            table += &self.print_table_row(c, &column_len);
+        for i in 0..cell.len() {
+            table += &self.print_table_row(cell.get(i).unwrap().to_owned(), &column_len);
+            table += &self.print_table_middle(&column_len);
         }
 
         table
@@ -199,7 +200,7 @@ impl<T: Write> Table<T> {
         table += &self.table_view.left;
         for row in rows {
             count += 1;
-            println!("{:?}", &row);
+            // println!("{:?}", &row);
             if space_count == 0 && count == 1 {
                 table += &" ".repeat(1);
             }
