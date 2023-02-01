@@ -60,7 +60,7 @@ fn main() {
     table.view()
 }
 ```
-![Basic bar](images/basic.png)
+![Basic bar](images/basic.PNG)
 
 ## Contributing 🤝
 Contributions, issues, and feature requests are welcome!
