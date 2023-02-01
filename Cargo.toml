@@ -1,6 +1,6 @@
 [package]
 name = "rct"
-version = "0.1.5"
+version = "0.1.0"
 edition = "2021"
 authors = ["disco07"]
 description = "CLI Table Output for Rust Project"

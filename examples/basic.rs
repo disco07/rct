@@ -11,7 +11,7 @@ fn main() {
         (4, "14.87".to_string()),
         (5, "€".to_string()),
         (6, "Harry Potter".to_string()),
-        (7, "2018-12-12 10:34:39".to_string()),
+        (7, "2001-12-05 10:34:39".to_string()),
     ]));
 
     data.push(BTreeMap::from([
@@ -21,10 +21,10 @@ fn main() {
         (4, "18.80".to_string()),
         (5, "€".to_string()),
         (6, "Spider-man, No Way Home.".to_string()),
-        (7, "2018-12-12 10:34:39".to_string()),
+        (7, "2021-12-17 22:15:00".to_string()),
     ]));
 
-    table.add_field(1, "sku");
+    table.add_field(1, "id");
     table.add_field(2, "title");
     table.add_field(3, "is_enabled");
     table.add_field(4, "price");
