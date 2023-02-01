@@ -81,26 +81,32 @@ impl Table<Stdout> {
     /// let mut table = Table::new();
     /// let mut data: Vec<BTreeMap<u32, String>> = vec![];
     /// data.push(BTreeMap::from([
-    ///  (1, "Drissa".to_string()),
-    ///  (2, "Kone".to_string()),
-    ///  (3, "07th April 1991".to_string()),
-    ///  (4, "Yes".to_string()),
-    ///  (5, "10 minutes".to_string()),
-    /// ]));
-    /// data.push(BTreeMap::from([
-    ///  (1, "Yaya".to_string()),
-    ///  (2, "Kone".to_string()),
-    ///  (3, "07th April 1991".to_string()),
-    ///  (4, "No".to_string()),
-    ///  (5, "9 minutes".to_string()),
-    /// ]));    ///
+    ///         (1, "62".to_string()),
+    ///         (2, "Harry Potter".to_string()),
+    ///         (3, "1".to_string()),
+    ///         (4, "14.87".to_string()),
+    ///         (5, "€".to_string()),
+    ///         (6, "Harry Potter".to_string()),
+    ///         (7, "2001-12-05 10:34:39".to_string()),
+    ///  ]));
+    ///  data.push(BTreeMap::from([
+    ///         (1, "72".to_string()),
+    ///         (2, "Spider-man".to_string()),
+    ///         (3, "0".to_string()),
+    ///         (4, "18.80".to_string()),
+    ///         (5, "€".to_string()),
+    ///         (6, "Spider-man, No Way Home.".to_string()),
+    ///         (7, "2021-12-17 22:15:00".to_string()),
+    ///  ]));
     ///
-    /// table.add_field(1, "First Name");
-    /// table.add_field(2, "Last Name");
-    /// table.add_field(3, "DOB");
-    /// table.add_field(4, "Admin");
-    /// table.add_field(5, "Last Seen");
-    /// table.add_data(data);
+    ///  table.add_field(1, "id");
+    ///  table.add_field(2, "title");
+    ///  table.add_field(3, "is_enabled");
+    ///  table.add_field(4, "price");
+    ///  table.add_field(5, "currency");
+    ///  table.add_field(6, "description");
+    ///  table.add_field(7, "created_at");
+    ///  table.add_data(data);
     ///
     /// table.view()
     ///
@@ -127,7 +133,7 @@ impl<T: Write> Table<T> {
 
     /// Add fields title to table.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// ```no_run
     /// use rct::rct::Table;
@@ -164,7 +170,7 @@ impl<T: Write> Table<T> {
                 *field.0,
                 max(
                     *column_len.get(field.0).unwrap(),
-                    field.1.get("name").unwrap().to_string().len() as u32,
+                    field.1.get("name").unwrap().to_string().chars().count() as u32,
                 ),
             );
         }
@@ -175,7 +181,7 @@ impl<T: Write> Table<T> {
                 for c in data {
                     column_len.insert(
                         *c.0,
-                        max(*column_len.get(c.0).unwrap(), c.1.to_string().len() as u32),
+                        max(*column_len.get(c.0).unwrap(), c.1.to_string().chars().count() as u32),
                     );
                 }
             }
@@ -236,7 +242,7 @@ impl<T: Write> Table<T> {
             }
             table += &row.1.trim();
             table +=
-                &" ".repeat((*column_len.get(&row.0).unwrap() - row.1.len() as u32 + 1) as usize);
+                &" ".repeat((*column_len.get(&row.0).unwrap() - row.1.chars().count() as u32 + 1) as usize);
 
             if column_len.len() > count {
                 table += &self.table_view.middle;

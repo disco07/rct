@@ -5,25 +5,32 @@ fn main() {
     let mut table = Table::new();
     let mut data: Vec<BTreeMap<u32, String>> = vec![];
     data.push(BTreeMap::from([
-        (1, "Drissa".to_string()),
-        (2, "Kone".to_string()),
-        (3, "07th April 1991".to_string()),
-        (4, "Yes".to_string()),
-        (5, "10 minutes".to_string()),
-    ]));
-    data.push(BTreeMap::from([
-        (1, "Yaya".to_string()),
-        (2, "Kone".to_string()),
-        (3, "07th April 1991".to_string()),
-        (4, "No".to_string()),
-        (5, "9 minutes".to_string()),
+        (1, "62".to_string()),
+        (2, "Harry Potter".to_string()),
+        (3, "1".to_string()),
+        (4, "14.87".to_string()),
+        (5, "€".to_string()),
+        (6, "Harry Potter".to_string()),
+        (7, "2001-12-05 10:34:39".to_string()),
     ]));
 
-    table.add_field(1, "First Name");
-    table.add_field(2, "Last Name");
-    table.add_field(3, "DOB");
-    table.add_field(4, "Admin");
-    table.add_field(5, "Last Seen");
+    data.push(BTreeMap::from([
+        (1, "72".to_string()),
+        (2, "Spider-man".to_string()),
+        (3, "0".to_string()),
+        (4, "18.80".to_string()),
+        (5, "€".to_string()),
+        (6, "Spider-man, No Way Home.".to_string()),
+        (7, "2021-12-17 22:15:00".to_string()),
+    ]));
+
+    table.add_field(1, "id");
+    table.add_field(2, "title");
+    table.add_field(3, "is_enabled");
+    table.add_field(4, "price");
+    table.add_field(5, "currency");
+    table.add_field(6, "description");
+    table.add_field(7, "created_at");
     table.add_data(data);
 
     table.view()
