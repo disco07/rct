@@ -7,12 +7,12 @@ A CLI Table Output for Rust 🦀 projects.
 ## Installation
 Add from command line.
 ```
-cargo add rct@0.1.0
+cargo add rct@0.1.1
 ```
 Or add this to your Cargo.toml file.
 ```
 [dependencies]
-rct = "0.1.0"
+rct = "0.1.1"
 
 # Or add from github main branch.
 rct = { git = "https://github.com/disco07/rct.git", branch = "main" }
