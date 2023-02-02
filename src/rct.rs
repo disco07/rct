@@ -1,3 +1,4 @@
+use crate::color::Colorizer;
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap};
 use std::io::{Stdout, Write};
@@ -158,6 +159,7 @@ impl<T: Write> Table<T> {
             HashMap::from([
                 ("key".to_string(), field_key.to_string()),
                 ("name".to_string(), field_name.to_string()),
+                ("color".to_string(), "".to_string()),
             ]),
         );
         self
@@ -176,10 +178,16 @@ impl<T: Write> Table<T> {
     ///
     /// ```
     pub fn add_color(&mut self, color: &str) -> &mut Table<T> {
+        let key: u32 = self.fields.keys().last().unwrap().to_string().parse().unwrap();
         self.fields.insert(
             *self.fields.keys().last().unwrap(),
             HashMap::from([
-                ("key".to_string(), self.fields.keys().last().unwrap().to_string()),
+                (
+                    "key".to_string(),
+                    key.to_string(),
+                ),
+
+                ("name".to_string(), self.fields.get(&key).unwrap().get("name").unwrap().to_string()),
                 ("color".to_string(), color.to_string()),
             ]),
         );
@@ -277,7 +285,10 @@ impl<T: Write> Table<T> {
             if space_count == 0 && count == 1 {
                 table += &" ".repeat(1);
             }
-            table += &row.1.trim();
+            table += &row
+                .1
+                .trim()
+                .colorize(self.fields.get(&row.0).unwrap().get("color").unwrap());
             table += &" ".repeat(
                 (*column_len.get(&row.0).unwrap() - row.1.chars().count() as u32 + 1) as usize,
             );
