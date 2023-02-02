@@ -69,46 +69,55 @@ impl Default for TableView {
     }
 }
 
+/// Create a new table CLI with default configuration.
+///
+/// # Examples
+///
+/// ```no_run
+/// use std::collections::BTreeMap;
+/// use rct::rct::Table;
+///
+/// let mut table = Table::new();
+/// let mut data: Vec<BTreeMap<u32, String>> = vec![];
+/// data.push(BTreeMap::from([
+///         (1, "62".to_string()),
+///         (2, "Harry Potter".to_string()),
+///         (3, "1".to_string()),
+///         (4, "14.87".to_string()),
+///         (5, "€".to_string()),
+///         (6, "Harry Potter".to_string()),
+///         (7, "2001-12-05 10:34:39".to_string()),
+///  ]));
+///  data.push(BTreeMap::from([
+///         (1, "72".to_string()),
+///         (2, "Spider-man".to_string()),
+///         (3, "0".to_string()),
+///         (4, "18.80".to_string()),
+///         (5, "€".to_string()),
+///         (6, "Spider-man, No Way Home.".to_string()),
+///         (7, "2021-12-17 22:15:00".to_string()),
+///  ]));
+///
+///  table.add_field(1, "id");
+///  table.add_field(2, "title");
+///  table.add_field(3, "is_enabled");
+///  table.add_field(4, "price");
+///  table.add_field(5, "currency");
+///  table.add_field(6, "description");
+///  table.add_field(7, "created_at");
+///  table.add_data(data);
+///
+/// table.view()
+///
+/// ```
 impl Table<Stdout> {
     /// Create a new table CLI with default configuration.
     ///
     /// # Examples
     ///
     /// ```no_run
-    /// use std::collections::BTreeMap;
     /// use rct::rct::Table;
-    ///
     /// let mut table = Table::new();
-    /// let mut data: Vec<BTreeMap<u32, String>> = vec![];
-    /// data.push(BTreeMap::from([
-    ///         (1, "62".to_string()),
-    ///         (2, "Harry Potter".to_string()),
-    ///         (3, "1".to_string()),
-    ///         (4, "14.87".to_string()),
-    ///         (5, "€".to_string()),
-    ///         (6, "Harry Potter".to_string()),
-    ///         (7, "2001-12-05 10:34:39".to_string()),
-    ///  ]));
-    ///  data.push(BTreeMap::from([
-    ///         (1, "72".to_string()),
-    ///         (2, "Spider-man".to_string()),
-    ///         (3, "0".to_string()),
-    ///         (4, "18.80".to_string()),
-    ///         (5, "€".to_string()),
-    ///         (6, "Spider-man, No Way Home.".to_string()),
-    ///         (7, "2021-12-17 22:15:00".to_string()),
-    ///  ]));
-    ///
-    ///  table.add_field(1, "id");
-    ///  table.add_field(2, "title");
-    ///  table.add_field(3, "is_enabled");
-    ///  table.add_field(4, "price");
-    ///  table.add_field(5, "currency");
-    ///  table.add_field(6, "description");
-    ///  table.add_field(7, "created_at");
-    ///  table.add_data(data);
-    ///
-    /// table.view()
     ///
     /// ```
     pub fn new() -> Table<Stdout> {
@@ -139,11 +148,11 @@ impl<T: Write> Table<T> {
     /// use rct::rct::Table;
     ///
     /// let mut table = Table::new();
-    /// table.add_field(1, "First Name");
-    /// table.add_field(2, "Last Name");
+    /// table.add_field(1, "ID");
+    /// table.add_field(2, "Title");
     ///
     /// ```
-    pub fn add_field(&mut self, field_key: u32, field_name: &str) {
+    pub fn add_field(&mut self, field_key: u32, field_name: &str) -> &mut Table<T> {
         self.fields.insert(
             field_key,
             HashMap::from([
@@ -151,6 +160,31 @@ impl<T: Write> Table<T> {
                 ("name".to_string(), field_name.to_string()),
             ]),
         );
+        self
+    }
+
+    /// Add color to the text.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use rct::rct::Table;
+    ///
+    /// let mut table = Table::new();
+    /// table.add_field(1, "ID").add_color("#ff0000");
+    /// table.add_field(2, "Title").add_color("#0000ff");
+    ///
+    /// ```
+    pub fn add_color(&mut self, color: &str) -> &mut Table<T> {
+        self.fields.insert(
+            *self.fields.keys().last().unwrap(),
+            HashMap::from([
+                ("key".to_string(), self.fields.keys().last().unwrap().to_string()),
+                ("color".to_string(), color.to_string()),
+            ]),
+        );
+
+        self
     }
 
     fn create_table(&self) -> String {
@@ -181,7 +215,10 @@ impl<T: Write> Table<T> {
                 for c in data {
                     column_len.insert(
                         *c.0,
-                        max(*column_len.get(c.0).unwrap(), c.1.to_string().chars().count() as u32),
+                        max(
+                            *column_len.get(c.0).unwrap(),
+                            c.1.to_string().chars().count() as u32,
+                        ),
                     );
                 }
             }
@@ -241,8 +278,9 @@ impl<T: Write> Table<T> {
                 table += &" ".repeat(1);
             }
             table += &row.1.trim();
-            table +=
-                &" ".repeat((*column_len.get(&row.0).unwrap() - row.1.chars().count() as u32 + 1) as usize);
+            table += &" ".repeat(
+                (*column_len.get(&row.0).unwrap() - row.1.chars().count() as u32 + 1) as usize,
+            );
 
             if column_len.len() > count {
                 table += &self.table_view.middle;

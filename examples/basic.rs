@@ -24,14 +24,15 @@ fn main() {
         (7, "2021-12-17 22:15:00".to_string()),
     ]));
 
-    table.add_field(1, "id");
-    table.add_field(2, "title");
-    table.add_field(3, "is_enabled");
-    table.add_field(4, "price");
-    table.add_field(5, "currency");
-    table.add_field(6, "description");
-    table.add_field(7, "created_at");
-    table.add_data(data);
+    table
+        .add_field(1, "id")
+        .add_field(2, "title")
+        .add_field(3, "is_enabled")
+        .add_field(4, "price")
+        .add_field(5, "currency")
+        .add_field(6, "description").add_color("")
+        .add_field(7, "created_at")
+        .add_data(data);
 
     table.view()
 }
