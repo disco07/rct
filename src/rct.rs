@@ -198,7 +198,7 @@ impl<T: Write> Table<T> {
     fn create_table(&self) -> String {
         let mut header: HashMap<u32, String> = HashMap::new();
         let mut column_len: HashMap<u32, u32> = HashMap::new();
-        let mut cell: Vec<HashMap<u32, String>> = vec![];
+        let mut cells: Vec<HashMap<u32, String>> = vec![];
         let mut table: String = String::new();
 
         for field in self.fields.iter() {
@@ -219,7 +219,14 @@ impl<T: Write> Table<T> {
 
         if self.data.len() > 0 {
             for data in self.data.iter() {
-                cell.push(HashMap::from_iter(data.to_owned()));
+                let iter = data.iter().map(|text|{
+                    let data = text.1.split(|t|t == "\n").collect::<Vec<String>>();
+                    if data.len() > 1 {
+
+                    }
+                }).collect::<Vec<_>>();
+                println!("{:?}", data);
+                cells.push(HashMap::from_iter(data.to_owned()));
                 for c in data {
                     column_len.insert(
                         *c.0,
@@ -237,10 +244,10 @@ impl<T: Write> Table<T> {
         table += &self.print_table_middle(&column_len);
 
         let mut count = 0;
-        for i in 0..cell.len() {
+        for i in 0..cells.len() {
             count += 1;
-            table += &self.print_table_row(cell.get(i).unwrap().to_owned(), &column_len);
-            if cell.len() > count {
+            table += &self.print_table_row(cells.get(i).unwrap().to_owned(), &column_len);
+            if cells.len() > count {
                 table += &self.print_table_middle(&column_len);
             } else {
                 table += &self.print_table_bottom(&column_len);

@@ -20,7 +20,7 @@ fn main() {
         (3, "0".to_string()),
         (4, "18.80".to_string()),
         (5, "€".to_string()),
-        (6, "Spider-man, No Way Home.".to_string()),
+        (6, "Spider-man\nNo Way Home.".to_string()),
         (7, "2021-12-17 22:15:00".to_string()),
     ]));
 
