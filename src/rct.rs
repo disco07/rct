@@ -219,13 +219,13 @@ impl<T: Write> Table<T> {
 
         if self.data.len() > 0 {
             for data in self.data.iter() {
-                let iter = data.iter().map(|text|{
-                    let data = text.1.split(|t|t == "\n").collect::<Vec<String>>();
-                    if data.len() > 1 {
-
-                    }
-                }).collect::<Vec<_>>();
-                println!("{:?}", data);
+                // let iter = data.iter().map(|text|{
+                //     let data = text.1.split(|t|t == "\n").collect::<Vec<String>>();
+                //     if data.len() > 1 {
+                //
+                //     }
+                // }).collect::<Vec<_>>();
+                // println!("{:?}", data);
                 cells.push(HashMap::from_iter(data.to_owned()));
                 for c in data {
                     column_len.insert(

@@ -1,0 +1,14 @@
+ignore:
+  - "examples"
+  - "CHANGELOG.md"
+  - "Cargo.lock"
+  - "Cargo.toml"
+  - "LICENSE"
+  - "README.md"
+
+codecov:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2%

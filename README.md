@@ -1,6 +1,7 @@
 [![Rust](https://github.com/disco07/rct/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/disco07/rct/actions/workflows/rust.yml)
 [![Crates.io](https://img.shields.io/crates/v/rct.svg)](https://crates.io/crates/rct)
 [![Documentation](https://docs.rs/rct/badge.svg)](https://docs.rs/rct/)
+[![codecov](https://codecov.io/gh/nukesor/rct/branch/main/graph/badge.svg)](https://codecov.io/gh/nukesor/rct)
 # rct
 A CLI Table Output for Rust 🦀 projects.
 
