@@ -219,13 +219,6 @@ impl<T: Write> Table<T> {
 
         if self.data.len() > 0 {
             for data in self.data.iter() {
-                // let iter = data.iter().map(|text|{
-                //     let data = text.1.split(|t|t == "\n").collect::<Vec<String>>();
-                //     if data.len() > 1 {
-                //
-                //     }
-                // }).collect::<Vec<_>>();
-                // println!("{:?}", data);
                 cells.push(HashMap::from_iter(data.to_owned()));
                 for c in data {
                     column_len.insert(
@@ -276,39 +269,93 @@ impl<T: Write> Table<T> {
         table
     }
 
+    fn split_map(&self, map: BTreeMap<u32, String>) -> Vec<BTreeMap<u32, String>> {
+        let mut result = vec![];
+        let mut current_map = BTreeMap::new();
+
+        for (key, value) in map {
+            if value.contains("\n") {
+                let values: Vec<&str> = value.split("\n").collect();
+                for i in 0..values.len() {
+                    let mut new_map = BTreeMap::new();
+                    for (k, v) in current_map.clone() {
+                        new_map.insert(k, v);
+                    }
+                    new_map.insert(key, values[i].to_owned());
+                    result.push(new_map);
+                }
+                current_map.clear();
+            } else {
+                current_map.insert(key, value);
+            }
+        }
+
+        if !current_map.is_empty() {
+            result.push(current_map);
+        }
+
+        result
+    }
+
     fn print_table_row(
         &self,
         fields: HashMap<u32, String>,
         column_len: &HashMap<u32, u32>,
     ) -> String {
-        let mut table: String = String::new();
-        let mut count = 0;
-        let mut space_count = 0;
         let rows: BTreeMap<_, _> = fields.into_iter().collect();
-        table += &self.table_view.left;
-        for row in rows {
-            count += 1;
+        let r = rows.iter().map(|row| {
+            let split: Vec<&str> = row.1.split("\n").collect();
+            (row.0.to_owned(), split)
+        }).collect::<Vec<(u32, Vec<&str>)>>();
 
-            if space_count == 0 && count == 1 {
-                table += &" ".repeat(1);
+        // println!("{:?}", self.split_map(rows.clone()));
+        let result = self.split_map(rows.clone());
+        for row in result.iter().enumerate() {
+            let
+            for ro in row.1 {
+                let first_key = *ro.0;
             }
-            table += &row
-                .1
-                .trim()
-                .colorize(self.fields.get(&row.0).unwrap().get("color").unwrap());
-            table += &" ".repeat(
-                (*column_len.get(&row.0).unwrap() - row.1.chars().count() as u32 + 1) as usize,
-            );
-
-            if column_len.len() > count {
-                table += &self.table_view.middle;
-            }
-            space_count = 1;
         }
-        table += &self.table_view.right;
-        table += "\n";
 
-        table
+        let mut count = 0;
+
+        let mut table = r.iter().flat_map(|row| {
+            let mut vec = vec![];
+            let mut space_count = 0;
+            let mut iter = 0;
+
+            if count == 0 {
+                vec.push(self.table_view.left.to_owned());
+            }
+            for r in row.1.iter() {
+                if iter > 0 {
+
+                } else {
+                    count += 1;
+                    if space_count == 0 && count == 1 {
+                        vec.push(" ".repeat(1));
+                    }
+                    vec.push(r
+                        .colorize(self.fields.get(&row.0).unwrap().get("color").unwrap()));
+                    vec.push(" ".repeat(
+                        (*column_len.get(&row.0).unwrap() - r.chars().count() as u32 + 1) as usize,
+                    ));
+
+                    if column_len.len() > count {
+                        vec.push(self.table_view.middle.to_owned());
+                    }
+                    space_count = 1;
+                }
+                iter += 1;
+            };
+            if count == column_len.len() {
+                vec.push(self.table_view.right.to_owned());
+            }
+            vec
+        }).collect::<Vec<_>>();
+        // println!("{:?}", table);
+        table.push("\n".to_string());
+        table.join("")
     }
 
     fn print_table_middle(&self, column_len: &HashMap<u32, u32>) -> String {

@@ -16,7 +16,7 @@ fn main() {
 
     data.push(BTreeMap::from([
         (1, "72".to_string()),
-        (2, "Spider-man".to_string()),
+        (2, "Spider\nman".to_string()),
         (3, "0".to_string()),
         (4, "18.80".to_string()),
         (5, "€".to_string()),
