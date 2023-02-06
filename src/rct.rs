@@ -303,59 +303,92 @@ impl<T: Write> Table<T> {
         column_len: &HashMap<u32, u32>,
     ) -> String {
         let rows: BTreeMap<_, _> = fields.into_iter().collect();
-        let r = rows.iter().map(|row| {
-            let split: Vec<&str> = row.1.split("\n").collect();
-            (row.0.to_owned(), split)
-        }).collect::<Vec<(u32, Vec<&str>)>>();
+        // let r = rows.iter().map(|row| {
+        //     let split: Vec<&str> = row.1.split("\n").collect();
+        //     (row.0.to_owned(), split)
+        // }).collect::<Vec<(u32, Vec<&str>)>>();
 
-        // println!("{:?}", self.split_map(rows.clone()));
         let result = self.split_map(rows.clone());
-        for row in result.iter().enumerate() {
-            let
-            for ro in row.1 {
-                let first_key = *ro.0;
-            }
-        }
-
+        println!("{:?}", result);
         let mut count = 0;
-
-        let mut table = r.iter().flat_map(|row| {
-            let mut vec = vec![];
+        let mut first_key = 0;
+        let mut vec = vec![];
+        for row in result.iter().enumerate() {
+            let mut key = 0;
             let mut space_count = 0;
-            let mut iter = 0;
-
-            if count == 0 {
-                vec.push(self.table_view.left.to_owned());
-            }
-            for r in row.1.iter() {
-                if iter > 0 {
-
-                } else {
-                    count += 1;
-                    if space_count == 0 && count == 1 {
-                        vec.push(" ".repeat(1));
-                    }
-                    vec.push(r
-                        .colorize(self.fields.get(&row.0).unwrap().get("color").unwrap()));
-                    vec.push(" ".repeat(
-                        (*column_len.get(&row.0).unwrap() - r.chars().count() as u32 + 1) as usize,
-                    ));
-
-                    if column_len.len() > count {
-                        vec.push(self.table_view.middle.to_owned());
-                    }
-                    space_count = 1;
+            for ro in row.1 {
+                // println!("{}-{}", first_key, *ro.0);
+                if first_key == *ro.0 {
+                    vec.push("\n".to_string());
+                    count = 0;
                 }
-                iter += 1;
-            };
+                if count == 0 {
+                    vec.push(self.table_view.left.to_owned());
+                }
+                count += 1;
+                if space_count == 0 && count == 1 {
+                    vec.push(" ".repeat(1));
+                }
+                if first_key == *ro.0 {
+                    vec.push("  ".colorize(self.fields.get(&ro.0).unwrap().get("color").unwrap()));
+                } else {
+                    vec.push(ro.1.colorize(self.fields.get(&ro.0).unwrap().get("color").unwrap()));
+                }
+                vec.push(" ".repeat(
+                    (*column_len.get(&ro.0).unwrap() - ro.1.chars().count() as u32 + 1) as usize,
+                ));
+                if column_len.len() > count {
+                    vec.push(self.table_view.middle.to_owned());
+                }
+                space_count = 1;
+                if key == 0 && first_key != *ro.0 {
+                    first_key = *ro.0;
+                    key = 1;
+                }
+            }
             if count == column_len.len() {
                 vec.push(self.table_view.right.to_owned());
             }
-            vec
-        }).collect::<Vec<_>>();
-        // println!("{:?}", table);
-        table.push("\n".to_string());
-        table.join("")
+        }
+        vec.push("\n".to_string());
+        vec.join("")
+        // let mut table = r.iter().flat_map(|row| {
+        //     let mut vec = vec![];
+        //     let mut space_count = 0;
+        //     let mut iter = 0;
+        //
+        //     if count == 0 {
+        //         vec.push(self.table_view.left.to_owned());
+        //     }
+        //     for r in row.1.iter() {
+        //         if iter > 0 {
+        //
+        //         } else {
+        //             count += 1;
+        //             if space_count == 0 && count == 1 {
+        //                 vec.push(" ".repeat(1));
+        //             }
+        //             vec.push(r
+        //                 .colorize(self.fields.get(&row.0).unwrap().get("color").unwrap()));
+        //             vec.push(" ".repeat(
+        //                 (*column_len.get(&row.0).unwrap() - r.chars().count() as u32 + 1) as usize,
+        //             ));
+        //
+        //             if column_len.len() > count {
+        //                 vec.push(self.table_view.middle.to_owned());
+        //             }
+        //             space_count = 1;
+        //         }
+        //         iter += 1;
+        //     };
+        //     if count == column_len.len() {
+        //         vec.push(self.table_view.right.to_owned());
+        //     }
+        //     vec
+        // }).collect::<Vec<_>>();
+        // // println!("{:?}", table);
+        // table.push("\n".to_string());
+        // table.join("")
     }
 
     fn print_table_middle(&self, column_len: &HashMap<u32, u32>) -> String {
