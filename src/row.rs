@@ -1,4 +1,3 @@
-use unicode_width::UnicodeWidthStr;
 use crate::cell::Cell;
 
 #[derive(Debug, Clone, Default)]
@@ -19,11 +18,7 @@ impl Row {
         self.cells
             .iter()
             .map(|cells| {
-            cells.data
-                .iter()
-                .map(|cell|cell.width())
-                .max()
-                .unwrap_or(0);
+            cells.width
         }).collect()
     }
 
