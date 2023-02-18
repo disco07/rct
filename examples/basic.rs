@@ -7,7 +7,7 @@ fn main() {
     table.add_header(vec!["ID".cell(), "Last Name".cell(), "First Name".cell()])
         .add_row(vec![1.cell(), "KONE".cell(), "Dris\nsa".cell()])
         .add_row(vec![2.cell(), "KONE".cell(), "Yaya".cell()])
-        .add_row(vec![3.cell(), "KONE".cell(), "Yacouba".cell()])
+        .add_row(vec![3.cell(), "KONE".cell(), "Yac\nouba".cell()])
     ;
 
     table.view()

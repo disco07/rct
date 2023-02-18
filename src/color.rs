@@ -5,7 +5,7 @@ pub trait Colorizer {
 impl Colorizer for str {
     fn colorize(&self, hex: &str) -> String {
         let mut color = String::new();
-        if hex.starts_with("#") && hex.len() == 7 {
+        if hex.starts_with('#') && hex.len() == 7 {
             color.push_str("\x1B[38;2;");
             color.push_str(
                 format!(

@@ -1,5 +1,5 @@
-use std::io::{Stdout, Write};
 use crate::row::Row;
+use std::io::{Stdout, Write};
 
 // Macro for writing to the giving writer.
 // Used in both pb.rs and multi.rs modules.
@@ -68,6 +68,12 @@ impl Default for Border {
     }
 }
 
+impl Default for Table<Stdout> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Table<Stdout> {
     pub fn new() -> Table<Stdout> {
         let handle = std::io::stdout();
@@ -111,9 +117,12 @@ impl<T: Write> Table<T> {
         column_len
     }
 
-    fn print_header(&mut self, column_len: &Vec<usize>) {
+    fn print_header(&mut self, column_len: &[usize]) {
         let mut view = self.border.top_left.to_string();
-        let len: Vec<String> = column_len.iter().map(|col| self.border.top.to_string().repeat(*col + 2)).collect();
+        let len: Vec<String> = column_len
+            .iter()
+            .map(|col| self.border.top.to_string().repeat(*col + 2))
+            .collect();
         view += len.join(self.border.top_mid.to_string().as_str()).as_str();
         view += self.border.top_right.to_string().as_str();
 
@@ -128,7 +137,7 @@ impl<T: Write> Table<T> {
         }
         print!("{:?}", content);
     }
-    
+
     fn print_line(&self, row: &Row, width_column: Vec<usize>) -> Vec<Vec<String>> {
         let mut content: Vec<Vec<String>> = vec![];
 
@@ -136,7 +145,7 @@ impl<T: Write> Table<T> {
             let mut cell_content = vec![];
             for data in cell.data.iter() {
                 let mut value = String::from("");
-                value += &" ".repeat(1);
+                value += &" ".to_string();
                 value += data;
                 value += &" ".repeat(cell.width);
                 cell_content.push(value);
@@ -144,11 +153,7 @@ impl<T: Write> Table<T> {
             content.push(cell_content);
         }
 
-        let max_column = content
-            .iter()
-            .map(|c|c.len())
-            .max()
-            .unwrap_or(0);
+        let max_column = content.iter().map(|c| c.len()).max().unwrap_or(0);
 
         let mut row_content = Vec::new();
 
@@ -157,7 +162,7 @@ impl<T: Write> Table<T> {
             for (index, cell) in content.iter().enumerate() {
                 match cell.get(i) {
                     Some(value) => line.push(value.to_string()),
-                    None => line.push(" ".repeat(*width_column.get(index).unwrap_or(&(0 as usize)))),
+                    None => line.push(" ".repeat(*width_column.get(index).unwrap_or(&(0_usize)))),
                 }
             }
             row_content.push(line);
@@ -172,7 +177,7 @@ impl<T: Write> Table<T> {
     }
 }
 
-fn max_column_length(column_len: &mut Vec<usize>, row: &Row) {
+fn max_column_length(column_len: &mut [usize], row: &Row) {
     let rows: Vec<_> = row.width();
 
     for row in rows.iter().enumerate() {
