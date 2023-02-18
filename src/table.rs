@@ -139,35 +139,47 @@ impl<T: Write> Table<T> {
     }
 
     fn print_line(&self, row: &Row, width_column: Vec<usize>) -> Vec<Vec<String>> {
-        let mut content: Vec<Vec<String>> = vec![];
-
-        for cell in row.cells.iter() {
-            let mut cell_content = vec![];
-            for data in cell.data.iter() {
-                let mut value = String::from("");
-                value += &" ".to_string();
-                value += data;
-                value += &" ".repeat(cell.width);
-                cell_content.push(value);
-            }
-            content.push(cell_content);
-        }
+        let content = row
+            .cells
+            .iter()
+            .map(|cell| {
+                cell.data.iter().fold(vec![], |mut acc, data| {
+                    let mut value = String::from("");
+                    value += &" ".to_string();
+                    value += &data;
+                    value += &" ".repeat(cell.width);
+                    acc.push(value);
+                    acc
+                })
+            })
+            .collect::<Vec<_>>();
 
         let max_column = content.iter().map(|c| c.len()).max().unwrap_or(0);
 
-        let mut row_content = Vec::new();
+        let row_content = (0..max_column)
+            .into_iter()
+            .flat_map(|i| {
+                let mut line = Vec::new();
+                let width_column = width_column.clone();
+                let size = content.len();
+                content
+                    .iter()
+                    .enumerate()
+                    .fold(vec![], move |mut acc, (index, cell)| {
+                        match cell.get(i) {
+                            Some(value) => line.push(value.to_string()),
+                            None => line.push(
+                                " ".repeat(*width_column.clone().get(index).unwrap_or(&(0_usize))),
+                            ),
+                        }
+                        if index + 1 == size {
+                            acc.push(line.clone());
+                        }
+                        acc
+                    })
+            })
+            .collect::<Vec<_>>();
 
-        for i in 0..max_column {
-            let mut line = Vec::new();
-            for (index, cell) in content.iter().enumerate() {
-                match cell.get(i) {
-                    Some(value) => line.push(value.to_string()),
-                    None => line.push(" ".repeat(*width_column.get(index).unwrap_or(&(0_usize)))),
-                }
-            }
-            row_content.push(line);
-        }
-        // print!("{:?}", width_column);
         row_content
     }
 
