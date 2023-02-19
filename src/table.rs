@@ -145,8 +145,8 @@ impl<T: Write> Table<T> {
             .map(|cell| {
                 cell.data.iter().fold(vec![], |mut acc, data| {
                     let mut value = String::from("");
-                    value += &" ".to_string();
-                    value += &data;
+                    value += " ";
+                    value += data;
                     value += &" ".repeat(cell.width);
                     acc.push(value);
                     acc
@@ -156,7 +156,7 @@ impl<T: Write> Table<T> {
 
         let max_column = content.iter().map(|c| c.len()).max().unwrap_or(0);
 
-        let row_content = (0..max_column)
+        (0..max_column)
             .into_iter()
             .flat_map(|i| {
                 let mut line = Vec::new();
@@ -178,9 +178,13 @@ impl<T: Write> Table<T> {
                         acc
                     })
             })
-            .collect::<Vec<_>>();
+            .collect::<Vec<_>>()
+    }
 
-        row_content
+    fn draw(&self, rows: Vec<Vec<String>>) -> Vec<String> {
+        let mut lines = vec![];
+
+        lines
     }
 
     /// Display the table on terminal.
