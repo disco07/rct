@@ -227,9 +227,9 @@ impl<T: Write> Table<T> {
                                             ),
                                     ),
                             ),
-                            None => line.push(" ".repeat(
-                                *width_column.clone().get(index).unwrap_or(&(0_usize)) + 1,
-                            )),
+                            None => line.push(
+                                " ".repeat(*width_column.clone().get(index).unwrap_or(&(0_usize))),
+                            ),
                         }
                         if index + 1 == size {
                             acc.push(line.clone());

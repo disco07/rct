@@ -16,7 +16,7 @@ fn main() {
         ])
         .add_row(vec![
             1.cell(),
-            "Harry Potter".cell(),
+            "Harry \nPotter".cell(),
             "1".cell(),
             "14.87".cell(),
             "€".cell(),
