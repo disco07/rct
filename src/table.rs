@@ -1,4 +1,5 @@
 use crate::row::Row;
+use std::cmp::min;
 use std::io::{Stdout, Write};
 
 /// Macro for writing to the giving writer.
@@ -107,7 +108,7 @@ impl<T: Write> Table<T> {
     }
 
     fn set_max_width(&mut self) -> Vec<usize> {
-        let mut column_len: Vec<usize> = vec![0; self.rows.len()];
+        let mut column_len: Vec<usize> = vec![0; self.rows[0].cells.len()];
         if let Some(header) = &self.header {
             max_column_length(&mut column_len, header);
         }
@@ -122,21 +123,66 @@ impl<T: Write> Table<T> {
         let mut view = self.border.top_left.to_string();
         let len: Vec<String> = column_len
             .iter()
-            .map(|col| self.border.top.to_string().repeat(*col + 2))
+            .map(|col| self.border.top.to_string().repeat(*col))
             .collect();
-        view += len.join(self.border.top_mid.to_string().as_str()).as_str();
-        view += self.border.top_right.to_string().as_str();
+        view += &len.join(&self.border.top_mid.to_string());
+        view += &self.border.top_right.to_string();
 
-        printfl!(self.handle, "\r{}", view);
+        printfl!(self.handle, "{}\n", view);
+    }
+
+    fn print_bottom(&mut self, column_len: &[usize]) {
+        let mut table: String = String::new();
+        let mut count = 0;
+
+        table += &self.border.bottom_left.to_string();
+        for len in column_len.iter() {
+            count += 1;
+            table += &self.border.bottom.to_string().repeat(*len);
+            if column_len.len() > count {
+                table += &self.border.bottom_mid.to_string();
+            }
+        }
+        table += &self.border.bottom_right.to_string();
+
+        printfl!(self.handle, "\n{}", table);
+    }
+
+    fn print_table_middle(&mut self, column_len: &[usize]) -> String {
+        let mut table: String = String::new();
+        let mut count = 0;
+        table += &self.border.left_mid.to_string();
+        for len in column_len.iter() {
+            count += 1;
+            table += &self.border.mid.to_string().repeat(*len);
+            if column_len.len() > count {
+                table += &self.border.mid_mid.to_string();
+            }
+        }
+        table += &self.border.right_mid.to_string();
+
+        table
     }
 
     fn print_lines(&mut self) {
-        let mut content = vec![];
+        let mut contents = vec![];
         let width_column = self.set_max_width();
-        for row in self.rows.iter() {
-            content.push(self.print_line(row, width_column.clone()));
+
+        match self.header.as_ref() {
+            Some(header) => {
+                contents.push(self.print_line(header, width_column.clone()));
+            }
+            None => (),
         }
-        print!("{:?}", content);
+        for row in self.rows.iter() {
+            contents.push(self.print_line(row, width_column.clone()));
+        }
+
+        self.print_header(&width_column);
+        for (index, content) in contents.iter().enumerate() {
+            self.draw(content, &width_column, (contents.len() - 1) == index);
+        }
+        self.print_bottom(&width_column);
     }
 
     fn print_line(&self, row: &Row, width_column: Vec<usize>) -> Vec<Vec<String>> {
@@ -148,7 +194,7 @@ impl<T: Write> Table<T> {
                     let mut value = String::from("");
                     value += " ";
                     value += data;
-                    value += &" ".repeat(cell.width);
+                    value += " ";
                     acc.push(value);
                     acc
                 })
@@ -168,10 +214,22 @@ impl<T: Write> Table<T> {
                     .enumerate()
                     .fold(vec![], move |mut acc, (index, cell)| {
                         match cell.get(i) {
-                            Some(value) => line.push(value.to_string()),
-                            None => line.push(
-                                " ".repeat(*width_column.clone().get(index).unwrap_or(&(0_usize))),
+                            Some(value) => line.push(
+                                value.to_string()
+                                    + &" ".repeat(
+                                        *width_column.clone().get(index).unwrap_or(&(0_usize))
+                                            - min(
+                                                *width_column
+                                                    .clone()
+                                                    .get(index)
+                                                    .unwrap_or(&(0_usize)),
+                                                value.chars().count(),
+                                            ),
+                                    ),
                             ),
+                            None => line.push(" ".repeat(
+                                *width_column.clone().get(index).unwrap_or(&(0_usize)) + 1,
+                            )),
                         }
                         if index + 1 == size {
                             acc.push(line.clone());
@@ -182,10 +240,29 @@ impl<T: Write> Table<T> {
             .collect::<Vec<_>>()
     }
 
-    fn draw(&self, rows: Vec<Vec<String>>) -> Vec<String> {
+    fn draw(&mut self, rows: &Vec<Vec<String>>, width_column: &Vec<usize>, last_row: bool) {
         let mut lines = vec![];
+        for (i, row) in rows.iter().enumerate() {
+            let mut view = String::new();
+            for (index, line) in row.iter().enumerate() {
+                if index == 0 {
+                    view += &self.border.left.to_string();
+                } else {
+                    view += &self.border.middle.to_string();
+                }
+                view += line;
+            }
+            view += &self.border.right.to_string();
+            lines.push(view);
+            if rows.len() - 1 == i && !last_row {
+                lines.push(self.print_table_middle(&width_column));
+            }
+        }
 
-        lines
+        printfl!(self.handle, "{}", lines.join("\n"));
+        if !last_row {
+            println!("\r")
+        }
     }
 
     /// Display the table on terminal.
@@ -197,10 +274,10 @@ impl<T: Write> Table<T> {
 fn max_column_length(column_len: &mut [usize], row: &Row) {
     let rows: Vec<_> = row.width();
 
-    for row in rows.iter().enumerate() {
-        let current_max = column_len.get(row.0).unwrap();
-        if *row.1 > *current_max {
-            column_len[row.0] = *row.1;
+    for (index, row) in rows.iter().enumerate() {
+        let current_max = column_len.get(index).unwrap_or(&0);
+        if *row > *current_max {
+            column_len[index] = *row + 2;
         }
     }
 }
