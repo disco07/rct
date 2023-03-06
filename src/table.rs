@@ -77,6 +77,15 @@ impl Default for Table<Stdout> {
 }
 
 impl Table<Stdout> {
+    /// Create a new table.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rct::table::Table;
+    /// let mut table = Table::new();
+    /// ```
+    ///
     pub fn new() -> Table<Stdout> {
         let handle = std::io::stdout();
         Table::on(handle)
@@ -93,6 +102,27 @@ impl<T: Write> Table<T> {
         }
     }
 
+    /// Add a new row to the table.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rct::cell::ICell;
+    /// use rct::table::Table;
+    /// let mut table = Table::new();
+    ///
+    /// table
+    ///     .add_row(vec![
+    ///         1.cell(),
+    ///         "Harry Potter".cell(),
+    ///         "1".cell(),
+    ///         "14.87".cell(),
+    ///         "€".cell(),
+    ///         "Harry Potter".cell(),
+    ///         "2001-12-05 22:05:20".cell(),
+    ///     ]);
+    /// ```
+    ///
     pub fn add_row<R: Into<Row>>(&mut self, row: R) -> &mut Table<T> {
         let row = row.into();
         self.rows.push(row);
@@ -100,6 +130,27 @@ impl<T: Write> Table<T> {
         self
     }
 
+    /// Add a header to the table.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rct::cell::ICell;
+    /// use rct::table::Table;
+    /// let mut table = Table::new();
+    ///
+    /// table
+    ///     .add_header(vec![
+    ///         "ID".cell(),
+    ///         "Title".cell(),
+    ///         "is_enabled".cell(),
+    ///         "price".cell(),
+    ///         "currency".cell(),
+    ///         "description".cell(),
+    ///         "created_at".cell(),
+    ///     ]);
+    /// ```
+    ///
     pub fn add_header<R: Into<Row>>(&mut self, row: R) -> &mut Table<T> {
         let row = row.into();
         self.header = Some(row);
@@ -107,8 +158,12 @@ impl<T: Write> Table<T> {
         self
     }
 
+    /// Returns the vec of max columns length for the table.
     fn set_max_width(&mut self) -> Vec<usize> {
+        // create a new vec of zero with size equal to number of columns
         let mut column_len: Vec<usize> = vec![0; self.rows[0].cells.len()];
+
+        // set values of vec with the max column length
         if let Some(header) = &self.header {
             max_column_length(&mut column_len, header);
         }
@@ -119,6 +174,7 @@ impl<T: Write> Table<T> {
         column_len
     }
 
+    /// print the top header of table.
     fn print_header(&mut self, column_len: &[usize]) {
         let mut view = self.border.top_left.to_string();
         let len: Vec<String> = column_len
@@ -131,6 +187,7 @@ impl<T: Write> Table<T> {
         printfl!(self.handle, "{}\n", view);
     }
 
+    /// print the bottom of table.
     fn print_bottom(&mut self, column_len: &[usize]) {
         let mut table: String = String::new();
         let mut count = 0;
@@ -148,6 +205,7 @@ impl<T: Write> Table<T> {
         printfl!(self.handle, "\n{}", table);
     }
 
+    /// print the middle (jointures between two rows) of table.
     fn print_table_middle(&mut self, column_len: &[usize]) -> String {
         let mut table: String = String::new();
         let mut count = 0;
@@ -164,6 +222,7 @@ impl<T: Write> Table<T> {
         table
     }
 
+    /// print every rows and header of table.
     fn print_lines(&mut self) {
         let mut contents = vec![];
         let width_column = self.set_max_width();
