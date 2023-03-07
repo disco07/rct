@@ -174,52 +174,50 @@ impl<T: Write> Table<T> {
         column_len
     }
 
-    /// print the top header of table.
+    /// print the top header with the given border or default of table like this:
+    /// ╔════════╤═══════════╗
+    ///
     fn print_header(&mut self, column_len: &[usize]) {
         let mut view = self.border.top_left.to_string();
-        let len: Vec<String> = column_len
+        // make an iterator to generate the border top and join this with border top middle
+        let header: Vec<String> = column_len
             .iter()
             .map(|col| self.border.top.to_string().repeat(*col))
             .collect();
-        view += &len.join(&self.border.top_mid.to_string());
+        view += &header.join(&self.border.top_mid.to_string());
         view += &self.border.top_right.to_string();
 
         printfl!(self.handle, "{}\n", view);
     }
 
-    /// print the bottom of table.
+    /// print the bottom with the given border or default of table like this:
+    /// ╚════════╧════════════╝
     fn print_bottom(&mut self, column_len: &[usize]) {
-        let mut table: String = String::new();
-        let mut count = 0;
+        let mut view: String = self.border.bottom_left.to_string();
+        // make an iterator to generate the border bottom and join this with border bottom middle
+        let bottom: Vec<String> = column_len
+            .iter()
+            .map(|col| self.border.bottom.to_string().repeat(*col))
+            .collect();
+        view += &bottom.join(&self.border.bottom_mid.to_string());
+        view += &self.border.bottom_right.to_string();
 
-        table += &self.border.bottom_left.to_string();
-        for len in column_len.iter() {
-            count += 1;
-            table += &self.border.bottom.to_string().repeat(*len);
-            if column_len.len() > count {
-                table += &self.border.bottom_mid.to_string();
-            }
-        }
-        table += &self.border.bottom_right.to_string();
-
-        printfl!(self.handle, "\n{}", table);
+        printfl!(self.handle, "\n{}", view);
     }
 
     /// print the middle (jointures between two rows) of table.
+    /// ╟────────┼──────────╢
     fn print_table_middle(&mut self, column_len: &[usize]) -> String {
-        let mut table: String = String::new();
-        let mut count = 0;
-        table += &self.border.left_mid.to_string();
-        for len in column_len.iter() {
-            count += 1;
-            table += &self.border.mid.to_string().repeat(*len);
-            if column_len.len() > count {
-                table += &self.border.mid_mid.to_string();
-            }
-        }
-        table += &self.border.right_mid.to_string();
+        let mut view: String = self.border.left_mid.to_string();
+        // make an iterator to generate the border middle
+        let middle: Vec<String> = column_len
+            .iter()
+            .map(|col| self.border.mid.to_string().repeat(*col))
+            .collect();
+        view += &middle.join(&self.border.mid_mid.to_string());
+        view += &self.border.right_mid.to_string();
 
-        table
+        view
     }
 
     /// print every rows and header of table.
@@ -227,14 +225,12 @@ impl<T: Write> Table<T> {
         let mut contents = vec![];
         let width_column = self.set_max_width();
 
-        match self.header.as_ref() {
-            Some(header) => {
-                contents.push(self.print_line(header, width_column.clone()));
-            }
-            None => (),
+        if let Some(header) = self.header.as_ref() {
+            contents.push(self.print_line(header, &width_column));
         }
+
         for row in self.rows.iter() {
-            contents.push(self.print_line(row, width_column.clone()));
+            contents.push(self.print_line(row, &width_column));
         }
 
         self.print_header(&width_column);
@@ -244,7 +240,7 @@ impl<T: Write> Table<T> {
         self.print_bottom(&width_column);
     }
 
-    fn print_line(&self, row: &Row, width_column: Vec<usize>) -> Vec<Vec<String>> {
+    fn print_line(&self, row: &Row, width_column: &[usize]) -> Vec<Vec<String>> {
         let content = row
             .cells
             .iter()
@@ -266,7 +262,6 @@ impl<T: Write> Table<T> {
             .into_iter()
             .flat_map(|i| {
                 let mut line = Vec::new();
-                let width_column = width_column.clone();
                 let size = content.len();
                 content
                     .iter()
@@ -276,19 +271,15 @@ impl<T: Write> Table<T> {
                             Some(value) => line.push(
                                 value.to_string()
                                     + &" ".repeat(
-                                        *width_column.clone().get(index).unwrap_or(&(0_usize))
+                                        *width_column.get(index).unwrap_or(&(0_usize))
                                             - min(
-                                                *width_column
-                                                    .clone()
-                                                    .get(index)
-                                                    .unwrap_or(&(0_usize)),
+                                                *width_column.get(index).unwrap_or(&(0_usize)),
                                                 value.chars().count(),
                                             ),
                                     ),
                             ),
-                            None => line.push(
-                                " ".repeat(*width_column.clone().get(index).unwrap_or(&(0_usize))),
-                            ),
+                            None => line
+                                .push(" ".repeat(*width_column.get(index).unwrap_or(&(0_usize)))),
                         }
                         if index + 1 == size {
                             acc.push(line.clone());
@@ -299,7 +290,7 @@ impl<T: Write> Table<T> {
             .collect::<Vec<_>>()
     }
 
-    fn draw(&mut self, rows: &Vec<Vec<String>>, width_column: &Vec<usize>, last_row: bool) {
+    fn draw(&mut self, rows: &Vec<Vec<String>>, width_column: &[usize], last_row: bool) {
         let mut lines = vec![];
         for (i, row) in rows.iter().enumerate() {
             let mut view = String::new();
@@ -314,7 +305,7 @@ impl<T: Write> Table<T> {
             view += &self.border.right.to_string();
             lines.push(view);
             if rows.len() - 1 == i && !last_row {
-                lines.push(self.print_table_middle(&width_column));
+                lines.push(self.print_table_middle(width_column));
             }
         }
 
