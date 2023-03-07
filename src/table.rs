@@ -10,8 +10,8 @@ use std::io::{Stdout, Write};
 /// ```rust, no_run
 /// use std::io;
 /// let w = io::stdout();
-/// printfl!(w, "");
-/// printfl!(w, "\r{}", out);
+/// let output = String::from("Hello, world!");
+/// printfl!(w, "\r{}", output);
 ///
 /// ```
 macro_rules! printfl {
