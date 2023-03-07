@@ -16,6 +16,7 @@ impl<T> ICell for T
 where
     T: Display,
 {
+    /// This will change each values contained the display Trait in string value
     fn cell(self) -> Cell {
         let data: Vec<String> = self.to_string().lines().map(ToString::to_string).collect();
         Cell {

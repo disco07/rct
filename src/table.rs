@@ -241,13 +241,14 @@ impl<T: Write> Table<T> {
     }
 
     fn print_line(&self, row: &Row, width_column: &[usize]) -> Vec<Vec<String>> {
+        // Iterate over all cells and create a new vector of all them like this:
+        // [["string1"], ["string2", "string3"], ["string4"]]
         let content = row
             .cells
             .iter()
             .map(|cell| {
                 cell.data.iter().fold(vec![], |mut acc, data| {
-                    let mut value = String::from("");
-                    value += " ";
+                    let mut value = String::from(" ");
                     value += data;
                     value += " ";
                     acc.push(value);
@@ -256,8 +257,16 @@ impl<T: Write> Table<T> {
             })
             .collect::<Vec<_>>();
 
+        // Get the maximum of length of vector into a vector.
+        // [["string1"], ["string2", "string3"], ["string4"]] --> 2
         let max_column = content.iter().map(|c| c.len()).max().unwrap_or(0);
 
+        // Now, we create a new to separate each value into a vector of vectors.
+        // We pass of this:
+        // [["string1"], ["string2", "string3"], ["string4"]]
+        //
+        // to this:
+        // [["string1"], ["string2"], ["", "string3", ""] ["string4"]]
         (0..max_column)
             .into_iter()
             .flat_map(|i| {
@@ -267,6 +276,10 @@ impl<T: Write> Table<T> {
                     .iter()
                     .enumerate()
                     .fold(vec![], move |mut acc, (index, cell)| {
+                        // Check if cell(vec) got a value with index i.
+                        // if value return value + whitespace or return whitespace,
+                        // the whitespace equal to width of column minus the minimum between
+                        // width of column and the length of value.
                         match cell.get(i) {
                             Some(value) => line.push(
                                 value.to_string()
@@ -290,7 +303,14 @@ impl<T: Write> Table<T> {
             .collect::<Vec<_>>()
     }
 
+    /// Create all of the lines in rows with the border.
     fn draw(&mut self, rows: &Vec<Vec<String>>, width_column: &[usize], last_row: bool) {
+        // We transform this vector:
+        // [["string1"], ["string2"], ["", "string3", ""] ["string4"]]
+        // to:
+        // [║"string1"│, "string2"│, "string4║]
+        // ╟──────┼──────────┼────────────╢
+        // [║"      "│, "string3"│, "      "║]
         let mut lines = vec![];
         for (i, row) in rows.iter().enumerate() {
             let mut view = String::new();
@@ -304,12 +324,14 @@ impl<T: Write> Table<T> {
             }
             view += &self.border.right.to_string();
             lines.push(view);
+            // do not add separators if it is the last line
             if rows.len() - 1 == i && !last_row {
                 lines.push(self.print_table_middle(width_column));
             }
         }
 
         printfl!(self.handle, "{}", lines.join("\n"));
+        // do not add line break if it is the last line
         if !last_row {
             println!("\r")
         }
@@ -321,6 +343,7 @@ impl<T: Write> Table<T> {
     }
 }
 
+/// Calculates the max length for every column.
 fn max_column_length(column_len: &mut [usize], row: &Row) {
     let rows: Vec<_> = row.width();
 

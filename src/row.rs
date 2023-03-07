@@ -7,21 +7,17 @@ pub struct Row {
 
 impl From<Vec<Cell>> for Row {
     fn from(value: Vec<Cell>) -> Self {
-        Row {
-            cells: value,
-        }
+        Row { cells: value }
     }
 }
 
 impl Row {
+    /// Get the cell's width in row.
     pub fn width(&self) -> Vec<usize> {
-        self.cells
-            .iter()
-            .map(|cells| {
-            cells.width
-        }).collect()
+        self.cells.iter().map(|cells| cells.width).collect()
     }
 
+    /// Get the length of the row
     pub fn columns(&self) -> usize {
         self.cells.len()
     }
