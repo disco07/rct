@@ -2,8 +2,7 @@ use crate::row::Row;
 use std::cmp::min;
 use std::io::{Stdout, Write};
 
-/// Macro for writing to the giving writer.
-/// Used in both pb.rs and multi.rs modules.
+/// Macro for writing on console.
 ///
 /// # Examples
 ///
@@ -11,10 +10,10 @@ use std::io::{Stdout, Write};
 /// use std::io;
 /// let w = io::stdout();
 /// let output = String::from("Hello, world!");
-/// printfl!(w, "\r{}", output);
+/// cprint!(w, "\r{}", output);
 ///
 /// ```
-macro_rules! printfl {
+macro_rules! cprint {
    ($w:expr, $($tt:tt)*) => {{
         $w.write_all(&format!($($tt)*).as_bytes()).ok().unwrap();
         $w.flush().ok().unwrap();
@@ -187,7 +186,7 @@ impl<T: Write> Table<T> {
         view += &header.join(&self.border.top_mid.to_string());
         view += &self.border.top_right.to_string();
 
-        printfl!(self.handle, "{}\n", view);
+        cprint!(self.handle, "{}\n", view);
     }
 
     /// print the bottom with the given border or default of table like this:
@@ -202,7 +201,7 @@ impl<T: Write> Table<T> {
         view += &bottom.join(&self.border.bottom_mid.to_string());
         view += &self.border.bottom_right.to_string();
 
-        printfl!(self.handle, "\n{}", view);
+        cprint!(self.handle, "\n{}", view);
     }
 
     /// print the middle (jointures between two rows) of table.
@@ -330,7 +329,7 @@ impl<T: Write> Table<T> {
             }
         }
 
-        printfl!(self.handle, "{}", lines.join("\n"));
+        cprint!(self.handle, "{}", lines.join("\n"));
         // do not add line break if it is the last line
         if !last_row {
             println!("\r")
