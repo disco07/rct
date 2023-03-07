@@ -1,18 +1,19 @@
 [![Rust](https://github.com/disco07/rct/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/disco07/rct/actions/workflows/rust.yml)
 [![Crates.io](https://img.shields.io/crates/v/rct.svg)](https://crates.io/crates/rct)
 [![Documentation](https://docs.rs/rct/badge.svg)](https://docs.rs/rct/)
+[![codecov](https://codecov.io/gh/nukesor/rct/branch/main/graph/badge.svg)](https://codecov.io/gh/nukesor/rct)
 # rct
 A CLI Table Output for Rust 🦀 projects.
 
 ## Installation
 Add from command line.
 ```
-cargo add rct@0.1.1
+cargo add rct@0.1.2
 ```
 Or add this to your Cargo.toml file.
 ```
 [dependencies]
-rct = "0.1.1"
+rct = "0.1.2"
 
 # Or add from github main branch.
 rct = { git = "https://github.com/disco07/rct.git", branch = "main" }
@@ -23,39 +24,48 @@ rct = { git = "https://github.com/disco07/rct.git", branch = "main" }
 ### Basic usage
 ```rust
 fn main() {
-    use rct::rct::Table;
-    use std::collections::BTreeMap;
-    
+    use rct::cell::ICell;
+    use rct::table::Table;
+
     let mut table = Table::new();
-    let mut data: Vec<BTreeMap<u32, String>> = vec![];
-    data.push(BTreeMap::from([
-        (1, "62".to_string()),
-        (2, "Harry Potter".to_string()),
-        (3, "1".to_string()),
-        (4, "14.87".to_string()),
-        (5, "€".to_string()),
-        (6, "Harry Potter".to_string()),
-        (7, "2018-12-12 10:34:39".to_string()),
-    ]));
 
-    data.push(BTreeMap::from([
-        (1, "72".to_string()),
-        (2, "Spider-man".to_string()),
-        (3, "0".to_string()),
-        (4, "18.80".to_string()),
-        (5, "€".to_string()),
-        (6, "Spider-man, No Way Home.".to_string()),
-        (7, "2018-12-12 10:34:39".to_string()),
-    ]));
-
-    table.add_field(1, "id");
-    table.add_field(2, "title");
-    table.add_field(3, "is_enabled");
-    table.add_field(4, "price");
-    table.add_field(5, "currency");
-    table.add_field(6, "description");
-    table.add_field(7, "created_at");
-    table.add_data(data);
+    table
+        .add_header(vec![
+            "ID".cell(),
+            "Title".cell(),
+            "is_enabled".cell(),
+            "price".cell(),
+            "currency".cell(),
+            "description".cell(),
+            "created_at".cell(),
+        ])
+        .add_row(vec![
+            1.cell(),
+            "Harry \nPotter".cell(),
+            "1".cell(),
+            "14.87".cell(),
+            "€".cell(),
+            "Harry Potter".cell(),
+            "2001-12-05 22:05:20".cell(),
+        ])
+        .add_row(vec![
+            2.cell(),
+            "Spider-man".cell(),
+            "0".cell(),
+            "18.80".cell(),
+            "€".cell(),
+            "Spider-man, No Way Home.".cell(),
+            "2018-12-12 09:04:50".cell(),
+        ])
+        .add_row(vec![
+            3.cell(),
+            "Avenger".cell(),
+            "1".cell(),
+            "18.50".cell(),
+            "€".cell(),
+            "Avenger".cell(),
+            "2017-10-12 10:34:39".cell(),
+        ]);
 
     table.view()
 }
