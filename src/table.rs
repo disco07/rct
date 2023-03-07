@@ -7,7 +7,7 @@ use std::io::{Stdout, Write};
 ///
 /// # Examples
 ///
-/// ```
+/// ```rust, no_run
 /// use std::io;
 /// let w = io::stdout();
 /// printfl!(w, "");
@@ -16,8 +16,8 @@ use std::io::{Stdout, Write};
 /// ```
 macro_rules! printfl {
    ($w:expr, $($tt:tt)*) => {{
-        $w.write_all(&format!($($tt)*).as_bytes()).ok().expect("write() fail");
-        $w.flush().ok().expect("flush() fail");
+        $w.write_all(&format!($($tt)*).as_bytes()).ok().unwrap();
+        $w.flush().ok().unwrap();
     }}
 }
 
@@ -81,7 +81,7 @@ impl Table<Stdout> {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```rust, no_run
     /// use rct::table::Table;
     /// let mut table = Table::new();
     /// ```
@@ -106,7 +106,7 @@ impl<T: Write> Table<T> {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```rust, no_run
     /// use rct::cell::ICell;
     /// use rct::table::Table;
     /// let mut table = Table::new();
@@ -134,7 +134,7 @@ impl<T: Write> Table<T> {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```rust, no_run
     /// use rct::cell::ICell;
     /// use rct::table::Table;
     /// let mut table = Table::new();
