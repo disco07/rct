@@ -42,5 +42,6 @@ fn main() {
             "2017-10-12 10:34:39".cell(),
         ]);
 
-    table.view()
+    table.view();
+    println!("\n");
 }
