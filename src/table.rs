@@ -137,7 +137,7 @@ impl Table {
     }
 
     /// Returns the vec of max columns length for the table.
-    fn set_max_width(&mut self) -> Vec<usize> {
+    fn set_max_width(&self) -> Vec<usize> {
         // create a new vec of zero with size equal to number of columns
         let mut column_len: Vec<usize> = vec![0; self.rows[0].cells.len()];
 
@@ -155,7 +155,7 @@ impl Table {
     /// print the top header with the given border or default of table like this:
     /// ╔════════╤═══════════╗
     ///
-    fn print_header(&mut self, column_len: &[usize]) -> String {
+    fn print_header(&self, column_len: &[usize]) -> String {
         let mut view = self.border.top_left.to_string();
         // make an iterator to generate the border top and join this with border top middle
         let header: Vec<String> = column_len
@@ -166,13 +166,12 @@ impl Table {
         view += &self.border.top_right.to_string();
         view += "\n";
 
-        //cprint!(self.handle, "{}\n", view);
         view
     }
 
     /// print the bottom with the given border or default of table like this:
     /// ╚════════╧════════════╝
-    fn print_bottom(&mut self, column_len: &[usize]) -> String {
+    fn print_bottom(&self, column_len: &[usize]) -> String {
         let mut view: String = self.border.bottom_left.to_string();
         // make an iterator to generate the border bottom and join this with border bottom middle
         let bottom: Vec<String> = column_len
@@ -182,13 +181,12 @@ impl Table {
         view += &bottom.join(&self.border.bottom_mid.to_string());
         view += &self.border.bottom_right.to_string();
 
-        //cprint!(self.handle, "\n{}", view);
         view
     }
 
     /// print the middle (jointures between two rows) of table.
     /// ╟────────┼──────────╢
-    fn print_table_middle(&mut self, column_len: &[usize]) -> String {
+    fn print_table_middle(&self, column_len: &[usize]) -> String {
         let mut view: String = self.border.left_mid.to_string();
         // make an iterator to generate the border middle
         let middle: Vec<String> = column_len
@@ -202,7 +200,7 @@ impl Table {
     }
 
     /// print every rows and header of table.
-    fn print_lines(&mut self) -> String {
+    fn print_lines(&self) -> String {
         let mut view = String::new();
         let mut contents = vec![];
         let width_column = self.set_max_width();
@@ -287,7 +285,7 @@ impl Table {
     }
 
     /// Create all of the lines in rows with the border.
-    fn draw(&mut self, rows: &Vec<Vec<String>>, width_column: &[usize], last_row: bool) -> String {
+    fn draw(&self, rows: &Vec<Vec<String>>, width_column: &[usize], last_row: bool) -> String {
         let mut view = String::new();
         // We transform this vector:
         // [["string1"], ["string2"], ["", "string3", ""] ["string4"]]
@@ -320,7 +318,7 @@ impl Table {
     }
 
     /// Display the table on terminal.
-    pub fn view(&mut self) {
+    pub fn view(&self) {
         println!("{}", self.print_lines());
     }
 }
