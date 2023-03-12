@@ -1,31 +1,12 @@
 use crate::row::Row;
 use std::cmp::min;
-use std::io::{Stdout, Write};
-
-/// Macro for writing on console.
-///
-/// # Examples
-///
-/// ```rust, no_run
-/// use std::io;
-/// let w = io::stdout();
-/// let output = String::from("Hello, world!");
-/// cprint!(w, "\r{}", output);
-///
-/// ```
-macro_rules! cprint {
-   ($w:expr, $($tt:tt)*) => {{
-        $w.write_all(&format!($($tt)*).as_bytes()).ok().unwrap();
-        $w.flush().ok().unwrap();
-    }}
-}
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone)]
-pub struct Table<T: Write> {
+pub struct Table {
     header: Option<Row>,
     rows: Vec<Row>,
     border: Border,
-    handle: T,
 }
 
 #[derive(Debug, Clone)]
@@ -69,13 +50,19 @@ impl Default for Border {
     }
 }
 
-impl Default for Table<Stdout> {
+impl Default for Table {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Table<Stdout> {
+impl Display for Table {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.print_lines())
+    }
+}
+
+impl Table {
     /// Create a new table.
     ///
     /// # Examples
@@ -85,19 +72,11 @@ impl Table<Stdout> {
     /// let mut table = Table::new();
     /// ```
     ///
-    pub fn new() -> Table<Stdout> {
-        let handle = std::io::stdout();
-        Table::on(handle)
-    }
-}
-
-impl<T: Write> Table<T> {
-    pub fn on(handle: T) -> Table<T> {
+    pub fn new() -> Table {
         Self {
             header: None,
             rows: vec![],
             border: Default::default(),
-            handle,
         }
     }
 
@@ -122,7 +101,7 @@ impl<T: Write> Table<T> {
     ///     ]);
     /// ```
     ///
-    pub fn add_row<R: Into<Row>>(&mut self, row: R) -> &mut Table<T> {
+    pub fn add_row<R: Into<Row>>(&mut self, row: R) -> &mut Table {
         let row = row.into();
         self.rows.push(row);
 
@@ -150,7 +129,7 @@ impl<T: Write> Table<T> {
     ///     ]);
     /// ```
     ///
-    pub fn add_header<R: Into<Row>>(&mut self, row: R) -> &mut Table<T> {
+    pub fn add_header<R: Into<Row>>(&mut self, row: R) -> &mut Table {
         let row = row.into();
         self.header = Some(row);
 
@@ -176,7 +155,7 @@ impl<T: Write> Table<T> {
     /// print the top header with the given border or default of table like this:
     /// ╔════════╤═══════════╗
     ///
-    fn print_header(&mut self, column_len: &[usize]) {
+    fn print_header(&mut self, column_len: &[usize]) -> String {
         let mut view = self.border.top_left.to_string();
         // make an iterator to generate the border top and join this with border top middle
         let header: Vec<String> = column_len
@@ -185,13 +164,15 @@ impl<T: Write> Table<T> {
             .collect();
         view += &header.join(&self.border.top_mid.to_string());
         view += &self.border.top_right.to_string();
+        view += "\n";
 
-        cprint!(self.handle, "{}\n", view);
+        //cprint!(self.handle, "{}\n", view);
+        view
     }
 
     /// print the bottom with the given border or default of table like this:
     /// ╚════════╧════════════╝
-    fn print_bottom(&mut self, column_len: &[usize]) {
+    fn print_bottom(&mut self, column_len: &[usize]) -> String {
         let mut view: String = self.border.bottom_left.to_string();
         // make an iterator to generate the border bottom and join this with border bottom middle
         let bottom: Vec<String> = column_len
@@ -201,7 +182,8 @@ impl<T: Write> Table<T> {
         view += &bottom.join(&self.border.bottom_mid.to_string());
         view += &self.border.bottom_right.to_string();
 
-        cprint!(self.handle, "\n{}", view);
+        //cprint!(self.handle, "\n{}", view);
+        view
     }
 
     /// print the middle (jointures between two rows) of table.
@@ -220,7 +202,8 @@ impl<T: Write> Table<T> {
     }
 
     /// print every rows and header of table.
-    fn print_lines(&mut self) {
+    fn print_lines(&mut self) -> String {
+        let mut view = String::new();
         let mut contents = vec![];
         let width_column = self.set_max_width();
 
@@ -232,11 +215,12 @@ impl<T: Write> Table<T> {
             contents.push(self.print_line(row, &width_column));
         }
 
-        self.print_header(&width_column);
+        view += &self.print_header(&width_column);
         for (index, content) in contents.iter().enumerate() {
-            self.draw(content, &width_column, (contents.len() - 1) == index);
+            view += &self.draw(content, &width_column, (contents.len() - 1) == index);
         }
-        self.print_bottom(&width_column);
+        view += &self.print_bottom(&width_column);
+        view
     }
 
     fn print_line(&self, row: &Row, width_column: &[usize]) -> Vec<Vec<String>> {
@@ -303,7 +287,8 @@ impl<T: Write> Table<T> {
     }
 
     /// Create all of the lines in rows with the border.
-    fn draw(&mut self, rows: &Vec<Vec<String>>, width_column: &[usize], last_row: bool) {
+    fn draw(&mut self, rows: &Vec<Vec<String>>, width_column: &[usize], last_row: bool) -> String {
+        let mut view = String::new();
         // We transform this vector:
         // [["string1"], ["string2"], ["", "string3", ""] ["string4"]]
         // to:
@@ -328,17 +313,15 @@ impl<T: Write> Table<T> {
                 lines.push(self.print_table_middle(width_column));
             }
         }
+        view += &lines.join("\n");
+        view += "\n";
 
-        cprint!(self.handle, "{}", lines.join("\n"));
-        // do not add line break if it is the last line
-        if !last_row {
-            println!("\r")
-        }
+        view
     }
 
     /// Display the table on terminal.
     pub fn view(&mut self) {
-        self.print_lines()
+        println!("{}", self.print_lines());
     }
 }
 
