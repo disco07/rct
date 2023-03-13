@@ -249,7 +249,6 @@ impl Table {
         // to this:
         // [["string1"], ["string2"], ["", "string3", ""] ["string4"]]
         (0..max_column)
-            .into_iter()
             .flat_map(|i| {
                 let mut line = Vec::new();
                 let size = content.len();
