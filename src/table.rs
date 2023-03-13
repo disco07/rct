@@ -317,6 +317,27 @@ impl Table {
     }
 
     /// Display the table on terminal.
+    ///
+    /// # Examples
+    ///
+    /// ```rust, no_run
+    /// use rct::cell::ICell;
+    /// use rct::table::Table;
+    /// let mut table = Table::new();
+    ///
+    /// table
+    ///     .add_row(vec![
+    ///         1.cell(),
+    ///         "Harry Potter".cell(),
+    ///         "1".cell(),
+    ///         "14.87".cell(),
+    ///         "€".cell(),
+    ///         "Harry Potter".cell(),
+    ///         "2001-12-05 22:05:20".cell(),
+    ///     ]);
+    ///
+    /// table.view();
+    /// ```
     pub fn view(&self) {
         println!("{}", self.print_lines());
     }

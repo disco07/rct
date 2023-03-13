@@ -3,7 +3,7 @@ use rct::table::Table;
 
 #[test]
 fn basic_table() {
-    let mut table = Table::new();
+    let mut table = Table::default();
 
     table
         .add_header(vec![
