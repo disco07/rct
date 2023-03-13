@@ -26,9 +26,3 @@ where
         }
     }
 }
-
-impl ICell for Cell {
-    fn cell(self) -> Cell {
-        self
-    }
-}
