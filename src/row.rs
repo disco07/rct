@@ -1,6 +1,6 @@
 use crate::cell::Cell;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct Row {
     pub cells: Vec<Cell>,
 }
@@ -15,10 +15,5 @@ impl Row {
     /// Get the cell's width in row.
     pub fn width(&self) -> Vec<usize> {
         self.cells.iter().map(|cells| cells.width).collect()
-    }
-
-    /// Get the length of the row
-    pub fn columns(&self) -> usize {
-        self.cells.len()
     }
 }

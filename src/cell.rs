@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use unicode_width::UnicodeWidthStr;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Cell {
     pub data: Vec<String>,
     pub height: usize,
