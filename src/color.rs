@@ -2,14 +2,11 @@ use crate::cell::{Cell, ICell};
 use std::fmt::Display;
 
 pub trait Colorizer {
-    fn colorize(&self, hex: &str) -> Self;
+    fn colorize(&self, hex: &str) -> Cell;
 }
 
-impl<T> Colorizer for T
-where
-    T: ICell + Display,
-{
-    fn colorize(&self, hex: &str) -> T {
+impl Colorizer for Cell {
+    fn colorize(&self, hex: &str) -> Cell {
         let mut color = String::new();
         if hex.starts_with('#') && hex.len() == 7 {
             color.push_str("\x1B[38;2;");
@@ -23,10 +20,17 @@ where
                 .as_str(),
             );
         }
+        let mut data = vec![];
         for mut cell in &self.data {
-            cell = &format!("{}{}\x1b[0m", color, cell);
+            let c = format!("{}{}\x1b[0m", color, cell);
+            data.push(c);
         }
-        self
+
+        Cell {
+            data,
+            height: self.height,
+            width: self.width,
+        }
     }
 }
 

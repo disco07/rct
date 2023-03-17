@@ -7,7 +7,7 @@ fn main() {
 
     table
         .add_header(vec![
-            "ID".cell().colorize("#cccccc"),
+            "ID".cell(),
             "Title".cell(),
             "is_enabled".cell(),
             "price".cell(),
@@ -17,7 +17,7 @@ fn main() {
         ])
         .add_row(vec![
             1.cell(),
-            "Harry \nPotter".cell(),
+            "Harry \nPotter".cell().colorize("#00ff00"),
             "1".cell(),
             "14.87".cell(),
             "€".cell(),
