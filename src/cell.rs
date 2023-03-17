@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::fmt::{Display, Formatter};
 use unicode_width::UnicodeWidthStr;
 
 #[derive(Debug, Clone)]
@@ -10,6 +10,12 @@ pub struct Cell {
 
 pub trait ICell {
     fn cell(self) -> Cell;
+}
+
+impl Display for Cell {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.data.join("\n"))
+    }
 }
 
 impl<T> ICell for T
