@@ -5,6 +5,17 @@ pub trait Colorizer {
 }
 
 impl Colorizer for Cell {
+    /// Colorizes [Cell] with hex color.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rct::cell::ICell;
+    /// use rct::color::Colorizer;
+    ///
+    /// let colour = "string".cell().colorize("#ffffff");
+    /// assert_eq!(colour.to_string(), "\u{1b}[38;2;255;255;255mstring\u{1b}[0m")
+    /// ```
     fn colorize(&self, hex: &str) -> Cell {
         let mut color = String::new();
         if hex.starts_with('#') && hex.len() == 7 {

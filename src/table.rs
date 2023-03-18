@@ -346,6 +346,8 @@ impl Table {
 /// Calculates the max length for every column.
 fn max_column_length(column_len: &mut [usize], row: &Row) {
     let rows: Vec<_> = row.width();
+    println!("column_len debut => {:?}", column_len);
+    println!("rows => {:?}", rows);
 
     for (index, row) in rows.iter().enumerate() {
         let current_max = column_len.get(index).unwrap_or(&0);
@@ -353,4 +355,5 @@ fn max_column_length(column_len: &mut [usize], row: &Row) {
             column_len[index] = *row + 2;
         }
     }
+    println!("column_len fin => {:?}", column_len);
 }
