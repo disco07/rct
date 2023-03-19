@@ -1,9 +1,22 @@
+use crate::cell::Cell;
+
 pub trait Colorizer {
-    fn colorize(&self, hex: &str) -> String;
+    fn color(&self, hex: &str) -> Cell;
 }
 
-impl Colorizer for str {
-    fn colorize(&self, hex: &str) -> String {
+impl Colorizer for Cell {
+    /// Colorizes [Cell] with hex color.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rct::cell::ICell;
+    /// use rct::color::Colorizer;
+    ///
+    /// let colour = "string".cell().color("#ffffff");
+    /// assert_eq!(colour.to_string(), "\u{1b}[38;2;255;255;255mstring\u{1b}[0m")
+    /// ```
+    fn color(&self, hex: &str) -> Cell {
         let mut color = String::new();
         if hex.starts_with('#') && hex.len() == 7 {
             color.push_str("\x1B[38;2;");
@@ -17,26 +30,68 @@ impl Colorizer for str {
                 .as_str(),
             );
         }
-        format!("{}{}\x1b[0m", color, self)
+        let mut data = vec![];
+        for cell in &self.data {
+            let c = format!("{}{}\x1b[0m", color, cell);
+            data.push(c);
+        }
+
+        Cell {
+            data,
+            height: self.height,
+            width: self.width,
+        }
     }
+}
+
+/// Transforms string colored to string.
+/// ```
+/// use rct::color::split_colors;
+/// let string = String::from("\u{1b}[38;2;255;255;255mstring\u{1b}[0m");
+/// let split_color = split_colors(&string);
+///
+/// assert_eq!(split_color, "string  ")
+/// ```
+pub fn split_colors(color: &str) -> String {
+    if color.contains("[38;2;") {
+        let (_, c) = color.split_once('m').unwrap();
+        let color_splited = c
+            .to_string()
+            .split('\u{1b}')
+            .map(String::from)
+            .collect::<Vec<_>>();
+        return color_splited[0].to_string() + &" ".repeat(2);
+    }
+
+    color.to_string()
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::color::Colorizer;
+    use crate::cell::ICell;
+    use crate::color::{split_colors, Colorizer};
     #[test]
     fn test_colorize_white() {
-        let colour = "string".colorize("#ffffff");
-        assert_eq!(colour, "\u{1b}[38;2;255;255;255mstring\u{1b}[0m")
+        let colour = "string".cell().color("#ffffff");
+        assert_eq!(
+            colour.to_string(),
+            "\u{1b}[38;2;255;255;255mstring\u{1b}[0m"
+        )
     }
     #[test]
     fn test_colorize_black() {
-        let colour = "string".colorize("#000000");
-        assert_eq!(colour, "\u{1b}[38;2;0;0;0mstring\u{1b}[0m")
+        let colour = "string".cell().color("#000000");
+        assert_eq!(colour.to_string(), "\u{1b}[38;2;0;0;0mstring\u{1b}[0m")
     }
     #[test]
     fn test_colorize_not_hex() {
-        let colour = "string".colorize("black");
-        assert_eq!(colour, "string\u{1b}[0m")
+        let colour = "string".cell().color("black");
+        assert_eq!(colour.to_string(), "string\u{1b}[0m")
+    }
+    #[test]
+    fn test_split_colors() {
+        let string = String::from("\u{1b}[38;2;255;255;255mstring\u{1b}[0m");
+        let split_color = split_colors(&string);
+        assert_eq!(split_color, "string  ")
     }
 }

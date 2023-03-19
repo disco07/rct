@@ -1,4 +1,4 @@
-pub mod color;
-pub mod table;
-pub mod row;
 pub mod cell;
+pub mod color;
+pub mod row;
+pub mod table;
