@@ -69,7 +69,7 @@ pub fn split_colors(color: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::cell::ICell;
-    use crate::color::Colorizer;
+    use crate::color::{split_colors, Colorizer};
     #[test]
     fn test_colorize_white() {
         let colour = "string".cell().color("#ffffff");
@@ -87,5 +87,11 @@ mod tests {
     fn test_colorize_not_hex() {
         let colour = "string".cell().color("black");
         assert_eq!(colour.to_string(), "string\u{1b}[0m")
+    }
+    #[test]
+    fn test_split_colors() {
+        let string = String::from("\u{1b}[38;2;255;255;255mstring\u{1b}[0m");
+        let split_color = split_colors(&string);
+        assert_eq!(split_color, "string  ")
     }
 }
