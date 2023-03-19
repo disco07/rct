@@ -1,7 +1,7 @@
 use crate::cell::Cell;
 
 pub trait Colorizer {
-    fn colorize(&self, hex: &str) -> Cell;
+    fn color(&self, hex: &str) -> Cell;
 }
 
 impl Colorizer for Cell {
@@ -13,10 +13,10 @@ impl Colorizer for Cell {
     /// use rct::cell::ICell;
     /// use rct::color::Colorizer;
     ///
-    /// let colour = "string".cell().colorize("#ffffff");
+    /// let colour = "string".cell().color("#ffffff");
     /// assert_eq!(colour.to_string(), "\u{1b}[38;2;255;255;255mstring\u{1b}[0m")
     /// ```
-    fn colorize(&self, hex: &str) -> Cell {
+    fn color(&self, hex: &str) -> Cell {
         let mut color = String::new();
         if hex.starts_with('#') && hex.len() == 7 {
             color.push_str("\x1B[38;2;");
@@ -72,7 +72,7 @@ mod tests {
     use crate::color::Colorizer;
     #[test]
     fn test_colorize_white() {
-        let colour = "string".cell().colorize("#ffffff");
+        let colour = "string".cell().color("#ffffff");
         assert_eq!(
             colour.to_string(),
             "\u{1b}[38;2;255;255;255mstring\u{1b}[0m"
@@ -80,12 +80,12 @@ mod tests {
     }
     #[test]
     fn test_colorize_black() {
-        let colour = "string".cell().colorize("#000000");
+        let colour = "string".cell().color("#000000");
         assert_eq!(colour.to_string(), "\u{1b}[38;2;0;0;0mstring\u{1b}[0m")
     }
     #[test]
     fn test_colorize_not_hex() {
-        let colour = "string".cell().colorize("black");
+        let colour = "string".cell().color("black");
         assert_eq!(colour.to_string(), "string\u{1b}[0m")
     }
 }

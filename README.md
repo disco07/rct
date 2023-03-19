@@ -8,12 +8,12 @@ A CLI Table Output for Rust 🦀 projects.
 ## Installation
 Add from command line.
 ```
-cargo add rct@0.1.2
+cargo add rct@0.1.3
 ```
 Or add this to your Cargo.toml file.
 ```
 [dependencies]
-rct = "0.1.2"
+rct = "0.1.3"
 
 # Or add from github main branch.
 rct = { git = "https://github.com/disco07/rct.git", branch = "main" }
@@ -70,7 +70,59 @@ fn main() {
     table.view()
 }
 ```
-![Basic bar](images/basic.PNG)
+![Basic table](images/basic.PNG)
+
+### Customizing the table (add colors)
+```rust
+use rct::cell::ICell;
+use rct::color::Colorizer;
+use rct::table::Table;
+
+fn main() {
+    let mut table = Table::new();
+
+    table
+        .add_header(vec![
+            "ID".cell(),
+            "Title".cell(),
+            "is_enabled".cell(),
+            "price".cell(),
+            "currency".cell(),
+            "description".cell(),
+            "created_at".cell(),
+        ])
+        .add_row(vec![
+            1.cell(),
+            "Harry \nPotter".cell().color("#ff0000"),
+            "1".cell(),
+            "14.87".cell(),
+            "€".cell(),
+            "Harry Potter".cell(),
+            "2001-12-05 22:05:20".cell(),
+        ])
+        .add_row(vec![
+            2.cell(),
+            "Spider-man".cell(),
+            "0".cell(),
+            "18.80".cell(),
+            "€".cell(),
+            "Spider-man, No Way Home.".cell().color("#0000ff"),
+            "2018-12-12 09:04:50".cell(),
+        ])
+        .add_row(vec![
+            3.cell(),
+            "Avenger".cell().color("#00ff00"),
+            "1".cell(),
+            "18.50".cell(),
+            "€".cell(),
+            "Avenger".cell(),
+            "2017-10-12 10:34:39".cell(),
+        ]);
+
+    table.view();
+}
+```
+![Color table](images/color_table.PNG)
 
 ## Contributing 🤝
 Contributions, issues, and feature requests are welcome!

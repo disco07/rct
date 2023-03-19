@@ -17,7 +17,7 @@ fn main() {
         ])
         .add_row(vec![
             1.cell(),
-            "Harry \nPotter".cell().colorize("#ff0000"),
+            "Harry \nPotter".cell().color("#ff0000"),
             "1".cell(),
             "14.87".cell(),
             "€".cell(),
@@ -30,12 +30,12 @@ fn main() {
             "0".cell(),
             "18.80".cell(),
             "€".cell(),
-            "Spider-man, No Way Home.".cell().colorize("#0000ff"),
+            "Spider-man, No Way Home.".cell().color("#0000ff"),
             "2018-12-12 09:04:50".cell(),
         ])
         .add_row(vec![
             3.cell(),
-            "Avenger".cell().colorize("#00ff00"),
+            "Avenger".cell().color("#00ff00"),
             "1".cell(),
             "18.50".cell(),
             "€".cell(),
@@ -44,5 +44,4 @@ fn main() {
         ]);
 
     table.view();
-    println!("\n");
 }
