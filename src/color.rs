@@ -57,10 +57,10 @@ pub fn split_colors(color: &str) -> String {
         let (_, c) = color.split_once('m').unwrap();
         let color_splited = c
             .to_string()
-            .split("\u{1b}")
+            .split('\u{1b}')
             .map(String::from)
             .collect::<Vec<_>>();
-        return (color_splited[0].to_string() + &" ".repeat(2)).to_string();
+        return color_splited[0].to_string() + &" ".repeat(2);
     }
 
     color.to_string()
