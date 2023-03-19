@@ -1,3 +1,4 @@
+use crate::color::split_colors;
 use crate::row::Row;
 use std::cmp::min;
 use std::fmt::{Display, Formatter};
@@ -267,7 +268,7 @@ impl Table {
                                         *width_column.get(index).unwrap_or(&(0_usize))
                                             - min(
                                                 *width_column.get(index).unwrap_or(&(0_usize)),
-                                                value.chars().count(),
+                                                split_colors(value).chars().count(),
                                             ),
                                     ),
                             ),
@@ -346,14 +347,10 @@ impl Table {
 /// Calculates the max length for every column.
 fn max_column_length(column_len: &mut [usize], row: &Row) {
     let rows: Vec<_> = row.width();
-    println!("column_len debut => {:?}", column_len);
-    println!("rows => {:?}", rows);
-
     for (index, row) in rows.iter().enumerate() {
         let current_max = column_len.get(index).unwrap_or(&0);
         if *row > *current_max {
             column_len[index] = *row + 2;
         }
     }
-    println!("column_len fin => {:?}", column_len);
 }

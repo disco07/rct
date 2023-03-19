@@ -44,6 +44,28 @@ impl Colorizer for Cell {
     }
 }
 
+/// Transforms string colored to string.
+/// ```
+/// use rct::color::split_colors;
+/// let string = String::from("\u{1b}[38;2;255;255;255mstring\u{1b}[0m");
+/// let split_color = split_colors(&string);
+///
+/// assert_eq!(split_color, "string  ")
+/// ```
+pub fn split_colors(color: &str) -> String {
+    if color.contains("[38;2;") {
+        let (_, c) = color.split_once('m').unwrap();
+        let color_splited = c
+            .to_string()
+            .split("\u{1b}")
+            .map(String::from)
+            .collect::<Vec<_>>();
+        return (color_splited[0].to_string() + &" ".repeat(2)).to_string();
+    }
+
+    color.to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use crate::cell::ICell;
