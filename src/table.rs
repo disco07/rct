@@ -1,5 +1,6 @@
-use crate::color::split_colors;
 use crate::row::Row;
+use crate::styles::borders::Border;
+use crate::styles::color::split_colors;
 use std::cmp::min;
 use std::fmt::{Display, Formatter};
 
@@ -8,47 +9,6 @@ pub struct Table {
     header: Option<Row>,
     rows: Vec<Row>,
     border: Border,
-}
-
-#[derive(Debug, Clone)]
-pub struct Border {
-    top: char,
-    top_mid: char,
-    top_left: char,
-    top_right: char,
-    bottom: char,
-    bottom_mid: char,
-    bottom_left: char,
-    bottom_right: char,
-    left: char,
-    left_mid: char,
-    middle: char,
-    right: char,
-    right_mid: char,
-    mid: char,
-    mid_mid: char,
-}
-
-impl Default for Border {
-    fn default() -> Self {
-        Self {
-            top: '═',
-            top_mid: '╤',
-            top_left: '╔',
-            top_right: '╗',
-            bottom: '═',
-            bottom_mid: '╧',
-            bottom_left: '╚',
-            bottom_right: '╝',
-            left: '║',
-            left_mid: '╟',
-            middle: '│',
-            right: '║',
-            right_mid: '╢',
-            mid: '─',
-            mid_mid: '┼',
-        }
-    }
 }
 
 impl Default for Table {

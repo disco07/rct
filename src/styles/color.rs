@@ -11,7 +11,7 @@ impl Colorizer for Cell {
     ///
     /// ```
     /// use rct::cell::ICell;
-    /// use rct::color::Colorizer;
+    /// use rct::styles::color::Colorizer;
     ///
     /// let colour = "string".cell().color("#ffffff");
     /// assert_eq!(colour.to_string(), "\u{1b}[38;2;255;255;255mstring\u{1b}[0m")
@@ -46,7 +46,7 @@ impl Colorizer for Cell {
 
 /// Transforms string colored to string.
 /// ```
-/// use rct::color::split_colors;
+/// use rct::styles::color::split_colors;
 /// let string = String::from("\u{1b}[38;2;255;255;255mstring\u{1b}[0m");
 /// let split_color = split_colors(&string);
 ///
@@ -69,7 +69,8 @@ pub fn split_colors(color: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::cell::ICell;
-    use crate::color::{split_colors, Colorizer};
+    use crate::styles::color::{split_colors, Colorizer};
+
     #[test]
     fn test_colorize_white() {
         let colour = "string".cell().color("#ffffff");
