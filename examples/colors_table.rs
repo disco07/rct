@@ -22,7 +22,7 @@ fn main() {
             "14.87".cell(),
             "€".cell(),
             "Harry Potter".cell(),
-            "2001-12-05 22:05:20".cell(),
+            "2001-12-05 22:05:20".cell().bg("#00ff00"),
         ])
         .add_row(vec![
             2.cell(),
