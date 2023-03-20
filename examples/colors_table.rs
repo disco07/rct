@@ -1,5 +1,5 @@
 use rct::cell::ICell;
-use rct::styles::color::Colorizer;
+use rct::styles::color::{Colorizer, Font};
 use rct::table::Table;
 
 fn main() {
@@ -26,7 +26,7 @@ fn main() {
         ])
         .add_row(vec![
             2.cell(),
-            "Spider-man".cell(),
+            "Spider-man".cell().font(Font::Italic),
             "0".cell(),
             "18.80".cell(),
             "€".cell(),

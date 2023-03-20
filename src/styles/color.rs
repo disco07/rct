@@ -4,6 +4,16 @@ use std::str;
 pub trait Colorizer {
     fn color(&self, hex: &str) -> Cell;
     fn bg(&self, hex: &str) -> Cell;
+    fn font(&self, font: Font) -> Cell;
+}
+
+pub enum Font {
+    Bold = 1,
+    Light = 2,
+    Italic = 3,
+    Underlined = 4,
+    Inverse = 7,
+    Strikethrough = 9,
 }
 
 impl Colorizer for Cell {
@@ -36,8 +46,37 @@ impl Colorizer for Cell {
         }
     }
 
+    /// Colorizes [Cell] with hex color.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rct::cell::ICell;
+    /// use rct::styles::color::Colorizer;
+    ///
+    /// let colour = "string".cell().bg("#ffffff");
+    /// assert_eq!(colour.to_string(), "\u{1b}[48;2;255;255;255mstring\u{1b}[0m")
+    /// ```
     fn bg(&self, hex: &str) -> Cell {
         let color = new_ansi(hex, 48);
+        // Create a new vector to hold the data with the color applied
+        let mut data = vec![];
+        for cell in &self.data {
+            // Apply the color code to each cell and reset the color at the end
+            let c = format!("{}{}\x1b[0m", color, cell);
+            data.push(c);
+        }
+
+        // Return a new Cell with the colored data and the original height and width
+        Cell {
+            data,
+            height: self.height,
+            width: self.width,
+        }
+    }
+
+    fn font(&self, font: Font) -> Cell {
+        let color = format!("\x1B[{}m", font as usize);
 
         // Create a new vector to hold the data with the color applied
         let mut data = vec![];
