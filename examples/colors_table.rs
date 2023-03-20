@@ -1,5 +1,5 @@
 use rct::cell::ICell;
-use rct::color::Colorizer;
+use rct::styles::color::Colorizer;
 use rct::table::Table;
 
 fn main() {

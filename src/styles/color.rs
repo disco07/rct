@@ -11,14 +11,16 @@ impl Colorizer for Cell {
     ///
     /// ```
     /// use rct::cell::ICell;
-    /// use rct::color::Colorizer;
+    /// use rct::styles::color::Colorizer;
     ///
     /// let colour = "string".cell().color("#ffffff");
     /// assert_eq!(colour.to_string(), "\u{1b}[38;2;255;255;255mstring\u{1b}[0m")
     /// ```
     fn color(&self, hex: &str) -> Cell {
         let mut color = String::new();
+        // Check if the hex code is valid (starts with '#' and has a length of 7)
         if hex.starts_with('#') && hex.len() == 7 {
+            // Append the color code to the 'color' string using the ANSI escape code format
             color.push_str("\x1B[38;2;");
             color.push_str(
                 format!(
@@ -30,12 +32,16 @@ impl Colorizer for Cell {
                 .as_str(),
             );
         }
+
+        // Create a new vector to hold the data with the color applied
         let mut data = vec![];
         for cell in &self.data {
+            // Apply the color code to each cell and reset the color at the end
             let c = format!("{}{}\x1b[0m", color, cell);
             data.push(c);
         }
 
+        // Return a new Cell with the colored data and the original height and width
         Cell {
             data,
             height: self.height,
@@ -46,7 +52,7 @@ impl Colorizer for Cell {
 
 /// Transforms string colored to string.
 /// ```
-/// use rct::color::split_colors;
+/// use rct::styles::color::split_colors;
 /// let string = String::from("\u{1b}[38;2;255;255;255mstring\u{1b}[0m");
 /// let split_color = split_colors(&string);
 ///
@@ -69,7 +75,8 @@ pub fn split_colors(color: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::cell::ICell;
-    use crate::color::{split_colors, Colorizer};
+    use crate::styles::color::{split_colors, Colorizer};
+
     #[test]
     fn test_colorize_white() {
         let colour = "string".cell().color("#ffffff");

@@ -1,6 +1,6 @@
-use crate::color::split_colors;
 use crate::row::Row;
-use std::cmp::min;
+use crate::styles::borders::Border;
+use crate::styles::color::split_colors;
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone)]
@@ -8,47 +8,6 @@ pub struct Table {
     header: Option<Row>,
     rows: Vec<Row>,
     border: Border,
-}
-
-#[derive(Debug, Clone)]
-pub struct Border {
-    top: char,
-    top_mid: char,
-    top_left: char,
-    top_right: char,
-    bottom: char,
-    bottom_mid: char,
-    bottom_left: char,
-    bottom_right: char,
-    left: char,
-    left_mid: char,
-    middle: char,
-    right: char,
-    right_mid: char,
-    mid: char,
-    mid_mid: char,
-}
-
-impl Default for Border {
-    fn default() -> Self {
-        Self {
-            top: '═',
-            top_mid: '╤',
-            top_left: '╔',
-            top_right: '╗',
-            bottom: '═',
-            bottom_mid: '╧',
-            bottom_left: '╚',
-            bottom_right: '╝',
-            left: '║',
-            left_mid: '╟',
-            middle: '│',
-            right: '║',
-            right_mid: '╢',
-            mid: '─',
-            mid_mid: '┼',
-        }
-    }
 }
 
 impl Default for Table {
@@ -222,64 +181,68 @@ impl Table {
         view
     }
 
+    /// Given a vector of cells, where each cell contains a vector of strings,
+    /// returns a vector of vectors, where each inner vector represents a row of the output.
+    /// The output format is a matrix where each value is padded with spaces to match the desired column width.
+    ///
+    /// # Arguments
+    ///
+    /// *`cells` - A vector of `Cell` structures, where each cell contains a vector of strings.
+    /// *`width_column` - A slice of integers representing the desired width of each column.
+    ///
+    /// # Example
+    ///
+    /// let cells = vec![
+    /// Cell { data: vec!["a"] },
+    /// Cell { data: vec!["b", "c", "d"] },
+    /// Cell { data: vec!["e"] }
+    /// ];
+    ///
+    /// let width_column = vec![3, 3, 3];
+    ///
+    /// let output = print_line(&cells, &width_column);
+    ///
+    /// assert_eq!(output, vec![
+    /// vec![" a ", " b ", " e "],
+    /// vec![" ", " c ", " "],
+    /// vec![" ", " d ", " "]
+    /// ]);
+    ///
     fn print_line(&self, row: &Row, width_column: &[usize]) -> Vec<Vec<String>> {
-        // Iterate over all cells and create a new vector of all them like this:
-        // [["string1"], ["string2", "string3"], ["string4"]]
+        // Collect the cell contents into a vector of vectors, adding spaces around each value
+        // Example input:
+        //   ["a", "b,c,d", "e"] --> [[" a "], [" b ", " c ", " d "], [" e "]]
         let content = row
             .cells
             .iter()
             .map(|cell| {
-                cell.data.iter().fold(vec![], |mut acc, data| {
-                    let mut value = String::from(" ");
-                    value += data;
-                    value += " ";
-                    acc.push(value);
-                    acc
-                })
+                cell.data
+                    .iter()
+                    .map(|data| format!(" {} ", data))
+                    .collect::<Vec<_>>()
             })
             .collect::<Vec<_>>();
 
-        // Get the maximum of length of vector into a vector.
-        // [["string1"], ["string2", "string3"], ["string4"]] --> 2
+        // Get the maximum number of cells in any column
+        // Example input:
+        //   [[" a "], [" b ", " c ", " d "], [" e "]] --> max_column = 3
         let max_column = content.iter().map(|c| c.len()).max().unwrap_or(0);
 
-        // Now, we create a new to separate each value into a vector of vectors.
-        // We pass of this:
-        // [["string1"], ["string2", "string3"], ["string4"]]
-        //
-        // to this:
-        // [["string1"], ["string2"], ["", "string3", ""] ["string4"]]
+        // Build a vector of vectors, with each inner vector representing a row of the output
+        // Example output:
+        //   [[" a ", " b ", " e "], ["   ", " c ", "   "], ["   ", " d ", "   "]]
         (0..max_column)
-            .flat_map(|i| {
-                let mut line = Vec::new();
-                let size = content.len();
-                content
-                    .iter()
-                    .enumerate()
-                    .fold(vec![], move |mut acc, (index, cell)| {
-                        // Check if cell(vec) got a value with index i.
-                        // if value return value + whitespace or return whitespace,
-                        // the whitespace equal to width of column minus the minimum between
-                        // width of column and the length of value.
-                        match cell.get(i) {
-                            Some(value) => line.push(
-                                value.to_string()
-                                    + &" ".repeat(
-                                        *width_column.get(index).unwrap_or(&(0_usize))
-                                            - min(
-                                                *width_column.get(index).unwrap_or(&(0_usize)),
-                                                split_colors(value).chars().count(),
-                                            ),
-                                    ),
-                            ),
-                            None => line
-                                .push(" ".repeat(*width_column.get(index).unwrap_or(&(0_usize)))),
-                        }
-                        if index + 1 == size {
-                            acc.push(line.clone());
-                        }
-                        acc
-                    })
+            .map(|i| {
+                let mut row = Vec::new();
+                for (index, col) in content.iter().enumerate() {
+                    let value = col.get(i).unwrap_or(&String::new()).to_owned();
+                    let width = *width_column.get(index).unwrap_or(&0);
+                    // Add padding to the cell value to match the desired column width
+                    let padding =
+                        " ".repeat(width.saturating_sub(split_colors(&value).chars().count()));
+                    row.push(format!("{}{}", value, padding));
+                }
+                row
             })
             .collect::<Vec<_>>()
     }
