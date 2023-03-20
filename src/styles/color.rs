@@ -139,7 +139,7 @@ pub fn split_colors(color: &str) -> String {
     if color.contains("[38;2;") || color.contains("[48;2;") {
         let strip_ansi_escapes = strip_ansi_escapes::strip(color).unwrap();
         let color = str::from_utf8(&strip_ansi_escapes).unwrap();
-        return format!("{}", color.to_string());
+        return format!("{}", color);
     }
 
     color.to_string()
