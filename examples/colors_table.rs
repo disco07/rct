@@ -1,5 +1,5 @@
 use rct::cell::ICell;
-use rct::styles::color::Colorizer;
+use rct::styles::color::{Colorizer, Font};
 use rct::table::Table;
 
 fn main() {
@@ -22,15 +22,18 @@ fn main() {
             "14.87".cell(),
             "€".cell(),
             "Harry Potter".cell(),
-            "2001-12-05 22:05:20".cell(),
+            "2001-12-05 22:05:20"
+                .cell()
+                .bg("#0000ff")
+                .font(Font::Blinking),
         ])
         .add_row(vec![
             2.cell(),
-            "Spider-man".cell(),
+            "Spider-man".cell().font(Font::Italic),
             "0".cell(),
-            "18.80".cell(),
+            "18.80".cell().font(Font::Bold),
             "€".cell(),
-            "Spider-man, No Way Home.".cell().color("#0000ff"),
+            "Spider-man, No Way Home.".cell().font(Font::Strikethrough),
             "2018-12-12 09:04:50".cell(),
         ])
         .add_row(vec![
