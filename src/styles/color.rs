@@ -12,7 +12,9 @@ pub enum Font {
     Light = 2,
     Italic = 3,
     Underlined = 4,
+    Blinking = 6,
     Inverse = 7,
+    Invisible = 8,
     Strikethrough = 9,
 }
 
@@ -75,6 +77,17 @@ impl Colorizer for Cell {
         }
     }
 
+    /// Colorizes [Cell] with hex color.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rct::cell::ICell;
+    /// use rct::styles::color::{Colorizer, Font};
+    ///
+    /// let colour = "string".cell().font(Font::Bold);
+    /// assert_eq!(colour.to_string(), "\u{1b}[1mstring\u{1b}[0m")
+    /// ```
     fn font(&self, font: Font) -> Cell {
         let color = format!("\x1B[{}m", font as usize);
 
@@ -135,7 +148,7 @@ pub fn split_colors(color: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::cell::ICell;
-    use crate::styles::color::{split_colors, Colorizer};
+    use crate::styles::color::{split_colors, Colorizer, Font};
 
     #[test]
     fn test_colorize_white() {
@@ -154,6 +167,11 @@ mod tests {
     fn test_bg_black() {
         let colour = "string".cell().bg("#000000");
         assert_eq!(colour.to_string(), "\u{1b}[48;2;0;0;0mstring\u{1b}[0m")
+    }
+    #[test]
+    fn test_font() {
+        let font = "string".cell().font(Font::Bold);
+        assert_eq!(font.to_string(), "\u{1b}[1mstring\u{1b}[0m")
     }
     #[test]
     fn test_colorize_not_hex() {
