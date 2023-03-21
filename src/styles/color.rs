@@ -1,4 +1,5 @@
 use crate::cell::Cell;
+use regex::Regex;
 use std::str;
 
 pub trait Colorizer {
@@ -12,6 +13,7 @@ pub enum Font {
     Light = 2,
     Italic = 3,
     Underlined = 4,
+    SlowBlinking = 5,
     Blinking = 6,
     Inverse = 7,
     Invisible = 8,
@@ -136,7 +138,9 @@ fn new_ansi(hex: &str, value: usize) -> String {
 /// assert_eq!(split_color, "string")
 /// ```
 pub fn split_colors(color: &str) -> String {
-    if color.contains("[38;2;") || color.contains("[48;2;") {
+    let re = Regex::new(r"\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]").unwrap();
+
+    if re.is_match(color) {
         let strip_ansi_escapes = strip_ansi_escapes::strip(color).unwrap();
         let color = str::from_utf8(&strip_ansi_escapes).unwrap();
         return color.to_string();
