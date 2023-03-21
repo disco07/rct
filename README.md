@@ -13,7 +13,7 @@ cargo add rct@0.1.3
 Or add this to your Cargo.toml file.
 ```
 [dependencies]
-rct = "0.1.3"
+rct = "0.1.4"
 
 # Or add from github main branch.
 rct = { git = "https://github.com/disco07/rct.git", branch = "main" }
