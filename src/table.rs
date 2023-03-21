@@ -233,16 +233,18 @@ impl Table {
         //   [[" a ", " b ", " e "], ["   ", " c ", "   "], ["   ", " d ", "   "]]
         (0..max_column)
             .map(|i| {
-                let mut row = Vec::new();
-                for (index, col) in content.iter().enumerate() {
-                    let value = col.get(i).unwrap_or(&String::new()).to_owned();
-                    let width = *width_column.get(index).unwrap_or(&0);
-                    // Add padding to the cell value to match the desired column width
-                    let padding =
-                        " ".repeat(width.saturating_sub(split_colors(&value).chars().count()));
-                    row.push(format!("{}{}", value, padding));
-                }
-                row
+                content
+                    .iter()
+                    .enumerate()
+                    .fold(vec![], |mut acc, (index, col)| {
+                        let value = col.get(i).unwrap_or(&String::new()).to_owned();
+                        let width = *width_column.get(index).unwrap_or(&0);
+                        // Add padding to the cell value to match the desired column width
+                        let padding =
+                            " ".repeat(width.saturating_sub(split_colors(&value).chars().count()));
+                        acc.push(format!("{}{}", value, padding));
+                        acc
+                    })
             })
             .collect::<Vec<_>>()
     }
