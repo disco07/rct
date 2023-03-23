@@ -8,7 +8,7 @@ A CLI Table Output for Rust 🦀 projects.
 ## Installation
 Add from command line.
 ```
-cargo add rct@0.1.3
+cargo install rct
 ```
 Or add this to your Cargo.toml file.
 ```
