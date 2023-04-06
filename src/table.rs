@@ -3,17 +3,11 @@ use crate::styles::borders::Border;
 use crate::styles::color::split_colors;
 use std::fmt::{Display, Formatter};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Table {
     header: Option<Row>,
     rows: Vec<Row>,
     border: Border,
-}
-
-impl Default for Table {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl Display for Table {
