@@ -17,11 +17,28 @@ impl Display for Table {
 }
 
 pub trait ITable<R> {
+    fn new() -> Table;
     fn add_row(&mut self, row: R) -> &mut Table;
     fn add_header(&mut self, row: R) -> &mut Table;
 }
 
 impl<R> ITable<R> for Table where R: Into<Row> {
+    /// Create a new table.
+    ///
+    /// # Examples
+    ///
+    /// ```rust, no_run
+    /// use rct::table::{Table, ITable};
+    /// let mut table = Table::new();
+    /// ```
+    ///
+    fn new() -> Table {
+        Self {
+            header: None,
+            rows: vec![],
+            border: Default::default(),
+        }
+    }
     /// Add a new row to the table.
     ///
     /// # Examples
@@ -81,23 +98,6 @@ impl<R> ITable<R> for Table where R: Into<Row> {
 }
 
 impl Table {
-    /// Create a new table.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, no_run
-    /// use rct::table::Table;
-    /// let mut table = Table::new();
-    /// ```
-    ///
-    pub fn new() -> Table {
-        Self {
-            header: None,
-            rows: vec![],
-            border: Default::default(),
-        }
-    }
-
     /// Returns the vec of max columns length for the table.
     fn set_max_width(&self) -> Vec<usize> {
         // create a new vec of zero with size equal to number of columns
