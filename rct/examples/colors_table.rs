@@ -1,6 +1,6 @@
 use rct::cell::ICell;
 use rct::styles::color::{Colorizer, Font};
-use rct::table::Table;
+use rct::table::{Table, ITable};
 
 fn main() {
     let mut table = Table::new();
