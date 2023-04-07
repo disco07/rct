@@ -1,5 +1,5 @@
 use rct::cell::ICell;
-use rct::table::Table;
+use rct::table::{Table, ITable};
 
 #[test]
 fn basic_table() {
