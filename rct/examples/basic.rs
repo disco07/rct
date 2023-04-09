@@ -1,5 +1,5 @@
-use rct::cell::ICell;
-use rct::table::{Table, ITable};
+use rct::ICell;
+use rct::Table;
 
 fn main() {
     let mut table = Table::new();

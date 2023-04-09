@@ -45,6 +45,7 @@ dependencies = [
 name = "rct"
 version = "0.1.4"
 dependencies = [
+ "rct_derive",
  "regex",
  "strip-ansi-escapes",
  "unicode-width",

@@ -2,6 +2,13 @@
 name = "rct_derive"
 version = "0.1.0"
 edition = "2021"
+authors = ["disco07 <koneenok@outlook.fr>"]
+description = "CLI Table Output for Rust Project"
+keywords = ["CLI", "cli", "Table", "rct"]
+categories = ["command-line-interface"]
+repository = "https://github.com/disco07/rct"
+documentation = "https://docs.rs/rct"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

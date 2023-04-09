@@ -1,6 +1,7 @@
-use rct_derive::Table;
+use rct_derive::ToTable;
+use rct::ITable;
 
-#[derive(Table)]
+#[derive(ToTable)]
 struct Movies {
     id: u32,
     title: String,
@@ -11,4 +12,16 @@ struct Movies {
     created_at: String,
 }
 
-fn main() {}
+fn main() {
+    let movies = Movies {
+        id: 1,
+        title: "Harry Potter".to_string(),
+        is_enabled: false,
+        price: 20.0,
+        currency: "$".to_string(),
+        description: "Movie".to_string(),
+        created_at: "2023-01-01".to_string(),
+    };
+    let table = movies.to_table();
+    println!("{}", table.to_string());
+}

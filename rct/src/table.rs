@@ -16,68 +16,14 @@ impl Display for Table {
     }
 }
 
-pub trait ITable<R> {
-    fn add_row(&mut self, row: R) -> &mut Table;
-    fn add_header(&mut self, row: R) -> &mut Table;
+pub trait ITable {
+    fn to_table(self) -> Table;
 }
 
-impl<R> ITable<R> for Table where R: Into<Row> {
-    /// Add a new row to the table.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, no_run
-    /// use rct::cell::ICell;
-    /// use rct::table::{Table, ITable};
-    /// let mut table = Table::new();
-    ///
-    /// table
-    ///     .add_row(vec![
-    ///         1.cell(),
-    ///         "Harry Potter".cell(),
-    ///         "1".cell(),
-    ///         "14.87".cell(),
-    ///         "€".cell(),
-    ///         "Harry Potter".cell(),
-    ///         "2001-12-05 22:05:20".cell(),
-    ///     ]);
-    /// ```
-    ///
-    fn add_row(&mut self, row: R) -> &mut Table {
-        let row = row.into();
-        self.rows.push(row);
-
+impl ITable for Table  {
+    fn to_table(self) -> Table {
         self
-    }
-
-    /// Add a header to the table.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, no_run
-    /// use rct::cell::ICell;
-    /// use rct::table::{Table, ITable};
-    /// let mut table = Table::new();
-    ///
-    /// table
-    ///     .add_header(vec![
-    ///         "ID".cell(),
-    ///         "Title".cell(),
-    ///         "is_enabled".cell(),
-    ///         "price".cell(),
-    ///         "currency".cell(),
-    ///         "description".cell(),
-    ///         "created_at".cell(),
-    ///     ]);
-    /// ```
-    ///
-    fn add_header(&mut self, row: R) -> &mut Table {
-        let row = row.into();
-        self.header = Some(row);
-
-        self
-    }
-    
+    }    
 }
 
 impl Table {
@@ -96,6 +42,62 @@ impl Table {
             rows: vec![],
             border: Default::default(),
         }
+    }
+
+        /// Add a new row to the table.
+    ///
+    /// # Examples
+    ///
+    /// ```rust, no_run
+    /// use rct::cell::ICell;
+    /// use rct::table::Table;
+    /// let mut table = Table::new();
+    ///
+    /// table
+    ///     .add_row(vec![
+    ///         1.cell(),
+    ///         "Harry Potter".cell(),
+    ///         "1".cell(),
+    ///         "14.87".cell(),
+    ///         "€".cell(),
+    ///         "Harry Potter".cell(),
+    ///         "2001-12-05 22:05:20".cell(),
+    ///     ]);
+    /// ```
+    ///
+    pub fn add_row<R: Into<Row>>(&mut self, row: R) -> &mut Table {
+        let row = row.into();
+        self.rows.push(row);
+
+        self
+    }
+
+    /// Add a header to the table.
+    ///
+    /// # Examples
+    ///
+    /// ```rust, no_run
+    /// use rct::cell::ICell;
+    /// use rct::table::Table;
+    /// let mut table = Table::new();
+    ///
+    /// table
+    ///     .add_header(vec![
+    ///         "ID".cell(),
+    ///         "Title".cell(),
+    ///         "is_enabled".cell(),
+    ///         "price".cell(),
+    ///         "currency".cell(),
+    ///         "description".cell(),
+    ///         "created_at".cell(),
+    ///     ]);
+    /// ```
+    ///
+    pub fn add_header<R: Into<Row>>(&mut self, row: R) -> &mut Table {
+        let row = row.into();
+        self.header = Some(row);
+
+        self
     }
 
     /// Returns the vec of max columns length for the table.
