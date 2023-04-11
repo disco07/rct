@@ -27,9 +27,9 @@
 //!
 //!     table
 //!         .add_header(vec!["ID".cell(), "Title".cell(), "Price €".cell()])
-//!         .add_row(vec![1.cell(),"Harry \nPotter".cell(), "14.87 €".cell()])
-//!         .add_row(vec![2.cell(),"Spider-man".cell(),"18.80 €".cell()])
-//!         .add_row(vec![3.cell(), "Avenger".cell(), "18.50 €".cell()]);
+//!         .add_row(vec![1.cell(),"Harry \nPotter".cell(), "14.87".cell()])
+//!         .add_row(vec![2.cell(),"Spider-man".cell(),"18.80".cell()])
+//!         .add_row(vec![3.cell(), "Avenger".cell(), "18.50".cell()]);
 //!     table.view();
 //! }
 //! ```
@@ -51,6 +51,38 @@
 //! <p align="center">
 //! <img src="https://raw.githubusercontent.com/disco07/rct/main/images/color_table.PNG" height="300" width="220" />
 //! </p>
+//!
+//! ### Use derive macro
+//! `#[derive(ToTable)]` can also be used to print a `Vec` or slice of `struct`s as table.
+//! ```rust
+//! use rct::ToTable;
+//!
+//! #[derive(ToTable)]
+//! struct Movies {
+//!     id: u32,
+//!     title: String,
+//!     price: f32,
+//! }
+//!
+//! fn main() {
+//!     let movies = [
+//!         Movies {
+//!             id: 1,
+//!             title: "Harry \nPotter".to_string(),
+//!             price: 14.87,
+//!         },
+//!         Movies {
+//!             id: 2,
+//!             title: "Spider-man".to_string(),
+//!             price: 18.80,
+//!         },
+//!     ];
+//!
+//!     let table = movies.into_iter().to_table();
+//!
+//!     println!("{}", table.to_string());
+//! }
+//! ```
 //!
 
 pub mod cell;
