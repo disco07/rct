@@ -53,7 +53,7 @@
 //! </p>
 //!
 //! ### Use derive macro
-//! `#[derive(ToTable)]` can also be used to print a `Vec` or slice of `struct`s as table.
+//! `#[derive(ToTable)]` can be used to display a `struct`, `Vec` or slice of `struct` as a table.
 //! ```rust
 //! use rct::ToTable;
 //!

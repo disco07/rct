@@ -8,7 +8,7 @@ use syn::{parse_macro_input, Data, DeriveInput, Fields};
 pub fn derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = &input.ident;
-    // eprintln!("{:#?}", input);
+    eprintln!("{:#?}", input);
     let fields = match input.data {
         Data::Struct(s) => match s.fields {
             Fields::Named(field_named) => field_named.named,
@@ -73,7 +73,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
         #[automatically_derived]
         impl<T> ITable for T
         where
-            T: Iterator<Item = #name>,
+            T: IntoIterator<Item = #name>,
         {
             fn to_table(self) -> rct::Table {
                 let mut table = rct::Table::new();
