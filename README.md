@@ -13,7 +13,7 @@ cargo install rct
 Or add this to your Cargo.toml file.
 ```
 [dependencies]
-rct = "0.1.4"
+rct = "0.1.5"
 
 # Or add from github main branch.
 rct = { git = "https://github.com/disco07/rct.git", branch = "main" }
@@ -70,7 +70,7 @@ fn main() {
     table.view()
 }
 ```
-![Basic table](images/basic.PNG)
+![Basic table](rct/images/basic.PNG)
 
 ### Customizing the table (add colors)
 ```rust
@@ -122,7 +122,7 @@ fn main() {
     table.view();
 }
 ```
-![Color table](images/color_table.PNG)
+![Color table](rct/images/color_table.PNG)
 
 ## Contributing 🤝
 Contributions, issues, and feature requests are welcome!

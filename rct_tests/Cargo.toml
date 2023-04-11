@@ -2,10 +2,12 @@
 name = "rct_tests"
 version = "0.1.0"
 edition = "2021"
+authors = ["disco07 <koneenok@outlook.fr>"]
+publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rct_derive = {path = "../rct_derive"}
 rct = {path = "../rct"}
-cli-table = "0.4"
+trybuild = { version = "1.0.66", features = ["diff"] }
