@@ -1,4 +1,4 @@
-use crate::row::Row;
+use crate::{row::Row};
 use crate::styles::borders::Border;
 use crate::styles::color::split_colors;
 use std::fmt::{Display, Formatter};
