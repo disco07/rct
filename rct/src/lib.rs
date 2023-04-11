@@ -10,7 +10,7 @@
 //!
 //! ## Usage
 //!
-//! Add `rct` in your `Cargo.toml`'s `dependencies` section
+//! Add `rct` in your `dependencies` section
 //!
 //! ```toml
 //! [dependencies]

@@ -21,10 +21,10 @@ fn main() {
             id: 2,
             title: "Spider-man".to_string(),
             price: 18.80,
-        }
+        },
     ];
 
     let table = movies.into_iter().to_table();
-    
+
     println!("{}", table.to_string());
 }
