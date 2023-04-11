@@ -16,16 +16,6 @@ impl Display for Table {
     }
 }
 
-pub trait ITable {
-    fn to_table(self) -> Table;
-}
-
-impl ITable for Table  {
-    fn to_table(self) -> Table {
-        self
-    }    
-}
-
 impl Table {
     /// Create a new table.
     ///
@@ -44,7 +34,7 @@ impl Table {
         }
     }
 
-        /// Add a new row to the table.
+    /// Add a new row to the table.
     ///
     /// # Examples
     ///

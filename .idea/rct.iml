@@ -13,6 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/rct_tests/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/rct_derive/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/rct/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

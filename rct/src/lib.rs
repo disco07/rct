@@ -10,5 +10,5 @@ pub use rct_derive::ToTable;
 pub use self::{
     cell::{Cell, ICell},
     row::Row,
-    table::{Table, ITable},
+    table::Table,
 };
