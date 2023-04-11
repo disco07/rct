@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 rct_derive = {path = "../rct_derive"}
 rct = {path = "../rct"}
+cli-table = "0.4"
