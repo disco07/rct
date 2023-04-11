@@ -109,6 +109,7 @@ fn get_attrs<'a>(field: &'a Field, attrs: &str) -> Option<&'a Attribute> {
     None
 }
 
+
 fn error_attr<T: ToTokens>(tokens: &T) -> proc_macro2::TokenStream {
     Error::new_spanned(tokens, "expected `table(bound = \"...\", ..)`").to_compile_error()
 }
