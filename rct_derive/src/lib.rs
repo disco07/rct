@@ -3,7 +3,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 
 use quote::{quote, ToTokens};
-use syn::{Attribute, Data, DeriveInput, Error, Field, Fields, Ident, Meta, parse_macro_input, Token};
+use syn::{Attribute, Data, DeriveInput, Error, Field, Fields, Ident, Meta, MetaList, parse_macro_input, Token};
 use syn::punctuated::Punctuated;
 
 #[proc_macro_derive(ToTable, attributes(table))]
@@ -112,20 +112,10 @@ fn create_method(field: &Field, i: &Ident) -> Result<proc_macro2::TokenStream, s
                 err => Err(Error::new_spanned(err, "unrecognized table")),
             };
             for nested_meta in meta_list.into_iter() {
-                match nested_meta {
-                    NestedMeta::Meta(Meta::NameValue(name_value)) => {
-                        // Do something with name_value
-                    }
-                    NestedMeta::Meta(Meta::List(list)) => {
-                        // Do something with list
-                    }
-                    NestedMeta::Meta(Meta::Path(path)) => {
-                        // Do something with path
-                    }
-                    NestedMeta::Lit(lit) => {
-                        // Do something with lit
-                    }
-                }
+                let meta = match nested_meta {
+                    MetaList { tokens, .. } => Ok(tokens),
+                }?;
+
             }
         }
     }
