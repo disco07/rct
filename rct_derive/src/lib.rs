@@ -111,7 +111,22 @@ fn create_method(field: &Field, i: &Ident) -> Result<proc_macro2::TokenStream, s
                 Meta::List(meta_list) => Ok(meta_list),
                 err => Err(Error::new_spanned(err, "unrecognized table")),
             };
-            for nested_meta in meta_list.unwrap().parse_nested_meta().nested.into_iter() {}
+            for nested_meta in meta_list.into_iter() {
+                match nested_meta {
+                    NestedMeta::Meta(Meta::NameValue(name_value)) => {
+                        // Do something with name_value
+                    }
+                    NestedMeta::Meta(Meta::List(list)) => {
+                        // Do something with list
+                    }
+                    NestedMeta::Meta(Meta::Path(path)) => {
+                        // Do something with path
+                    }
+                    NestedMeta::Lit(lit) => {
+                        // Do something with lit
+                    }
+                }
+            }
         }
     }
 
