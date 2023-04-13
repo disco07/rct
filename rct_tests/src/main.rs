@@ -1,3 +1,4 @@
+use rct::styles::color::{Colorizer, Font};
 use rct::ToTable;
 
 #[derive(ToTable)]
@@ -6,7 +7,7 @@ struct Movies {
     id: u32,
     #[table(rename = "Title", bg = "#0000ff")]
     title: String,
-    #[table(rename = "Price €", font = "Font::Blinking")]
+    #[table(rename = "Price €", font = "Font::Italic")]
     price: f32,
 }
 

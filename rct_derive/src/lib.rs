@@ -4,8 +4,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::punctuated::Punctuated;
 use syn::{
-    parse_macro_input, Attribute, Data, DeriveInput, Expr, ExprLit, Field, Fields, Ident, Lit,
-    Meta, Token,
+    parse_macro_input, Attribute, Data, DeriveInput, Expr, ExprLit, Field, Fields, Lit, Meta, Token,
 };
 
 #[proc_macro_derive(ToTable, attributes(table))]
@@ -38,7 +37,8 @@ pub fn derive(input: TokenStream) -> TokenStream {
         .iter()
         .map(|f| {
             let name = f.ident.as_ref().unwrap();
-            let method = extend_method(f);
+            let method = extend_method(f).unwrap();
+            // eprintln!("{:#?}", method);
             quote! {
                 self.#name.cell() #method
             }
@@ -49,7 +49,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
         .iter()
         .map(|f| {
             let name = f.ident.as_ref().unwrap();
-            let method = extend_method(f);
+            let method = extend_method(f).unwrap();
             quote! {
                 field.#name.cell() #method
             }
@@ -58,7 +58,6 @@ pub fn derive(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         use rct::ICell;
-        use rct::styles::color::{Colorizer, Font};
 
         pub trait ITable {
             fn to_table(self) -> rct::Table;
@@ -107,12 +106,10 @@ fn get_attrs<'a>(field: &'a Field, attrs: &str) -> Option<&'a Attribute> {
 //     Error::new_spanned(tokens, "expected `table(bound = \"...\", ..)`").to_compile_error()
 // }
 
-fn extend_method(field: &Field) -> proc_macro2::TokenStream {
+fn extend_method(field: &Field) -> Result<proc_macro2::TokenStream, syn::Error> {
     let mut table = proc_macro2::TokenStream::new();
     if let Some(attr) = get_attrs(field, "table") {
-        let nested = attr
-            .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)
-            .expect("error parsing ici");
+        let nested = attr.parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
         for meta in nested {
             match meta {
                 Meta::NameValue(meta) => match meta.path.get_ident() {
@@ -126,26 +123,49 @@ fn extend_method(field: &Field) -> proc_macro2::TokenStream {
                     }
                     Some(ident) if ident == "color" => {
                         if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
-                            if let Lit::Str(li) = lit {
-                                let s = li.token();
-                                table.extend(quote! {.color(#s)});
+                            match lit {
+                                Lit::Str(lit_str) => {
+                                    let s = lit_str.value();
+                                    table.extend(quote! {.color(#s)});
+                                }
+                                err => {
+                                    return Err(syn::Error::new_spanned(
+                                        err,
+                                        "Invalid value for #[table(color = \"value\")]",
+                                    ))
+                                }
                             }
                         }
                     }
                     Some(ident) if ident == "bg" => {
                         if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
-                            if let Lit::Str(li) = lit {
-                                let s = li.value();
-                                table.extend(quote! {.bg(#s)});
+                            match lit {
+                                Lit::Str(lit_str) => {
+                                    let s = lit_str.value();
+                                    table.extend(quote! {.bg(#s)});
+                                }
+                                err => {
+                                    return Err(syn::Error::new_spanned(
+                                        err,
+                                        "Invalid value for #[table(bg = \"value\")]",
+                                    ))
+                                }
                             }
                         }
                     }
                     Some(ident) if ident == "font" => {
                         if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
-                            if let Lit::Str(li) = lit {
-                                let s = li.value();
-                                let ident = Ident::new(&s, proc_macro2::Span::call_site());
-                                table.extend(quote! {.font(#ident)});
+                            match lit {
+                                Lit::Str(lit_str) => {
+                                    let s = lit_str.value();
+                                    table.extend(quote! {.font(#s)});
+                                }
+                                err => {
+                                    return Err(syn::Error::new_spanned(
+                                        err,
+                                        "Invalid value for #[table(font = \"value\")]",
+                                    ))
+                                }
                             }
                         }
                     }
@@ -160,5 +180,5 @@ fn extend_method(field: &Field) -> proc_macro2::TokenStream {
         }
     }
 
-    table
+    Ok(table)
 }
