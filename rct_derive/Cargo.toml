@@ -20,7 +20,7 @@ name = "rct_derive"
 proc-macro = true
 
 [dependencies]
-syn = { version = "2.0.14", features = ["extra-traits"] }
+syn = { version = "2.0.5", features = ["extra-traits"] }
 quote = "1.0.26"
 proc-macro2 = "1.0.53"
 

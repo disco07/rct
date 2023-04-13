@@ -2,11 +2,11 @@ use rct::ToTable;
 
 #[derive(ToTable)]
 struct Movies {
-    #[table(name = "ID", color = "#00ff00")]
+    #[table(rename = "ID", color = "#00ff00")]
     id: u32,
-    #[table(name = "Title", bg = "#0000ff")]
+    #[table(rename = "Title", bg = "#0000ff")]
     title: String,
-    #[table(name = "Price €", font = "Font::Blinking")]
+    #[table(rename = "Price €", font = "Font::Blinking")]
     price: f32,
 }
 

@@ -1,16 +1,18 @@
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
-
-use quote::{quote, ToTokens};
-use syn::{Attribute, Data, DeriveInput, Error, Field, Fields, Ident, Meta, MetaList, parse_macro_input, Token};
+use quote::quote;
 use syn::punctuated::Punctuated;
+use syn::{
+    parse_macro_input, Attribute, Data, DeriveInput, Expr, ExprLit, Field, Fields, Ident, Lit,
+    Meta, Token,
+};
 
 #[proc_macro_derive(ToTable, attributes(table))]
 pub fn derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = &input.ident;
-    eprintln!("{:#?}", input);
+    // eprintln!("{:#?}", input);
     let fields = match input.data {
         Data::Struct(s) => match s.fields {
             Fields::Named(field_named) => field_named.named,
@@ -36,8 +38,9 @@ pub fn derive(input: TokenStream) -> TokenStream {
         .iter()
         .map(|f| {
             let name = f.ident.as_ref().unwrap();
+            let method = extend_method(f);
             quote! {
-                self.#name.cell()
+                self.#name.cell() #method
             }
         })
         .collect::<Vec<_>>();
@@ -46,14 +49,16 @@ pub fn derive(input: TokenStream) -> TokenStream {
         .iter()
         .map(|f| {
             let name = f.ident.as_ref().unwrap();
+            let method = extend_method(f);
             quote! {
-                field.#name.cell()
+                field.#name.cell() #method
             }
         })
         .collect::<Vec<_>>();
 
     let expanded = quote! {
         use rct::ICell;
+        use rct::styles::color::{Colorizer, Font};
 
         pub trait ITable {
             fn to_table(self) -> rct::Table;
@@ -95,30 +100,65 @@ pub fn derive(input: TokenStream) -> TokenStream {
 }
 
 fn get_attrs<'a>(field: &'a Field, attrs: &str) -> Option<&'a Attribute> {
-    field.attrs.iter().find(|a| { a.path().is_ident(attrs) })
+    field.attrs.iter().find(|a| a.path().is_ident(attrs))
 }
 
+// fn error_attr<T: ToTokens>(tokens: &T) -> proc_macro2::TokenStream {
+//     Error::new_spanned(tokens, "expected `table(bound = \"...\", ..)`").to_compile_error()
+// }
 
-fn error_attr<T: ToTokens>(tokens: &T) -> proc_macro2::TokenStream {
-    Error::new_spanned(tokens, "expected `table(bound = \"...\", ..)`").to_compile_error()
-}
-
-fn create_method(field: &Field, i: &Ident) -> Result<proc_macro2::TokenStream, syn::Error> {
+fn extend_method(field: &Field) -> proc_macro2::TokenStream {
+    let mut table = proc_macro2::TokenStream::new();
     if let Some(attr) = get_attrs(field, "table") {
-        let nested = attr.parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
+        let nested = attr
+            .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)
+            .expect("error parsing ici");
         for meta in nested {
-            let meta_list = match meta {
-                Meta::List(meta_list) => Ok(meta_list),
-                err => Err(Error::new_spanned(err, "unrecognized table")),
+            match meta {
+                Meta::NameValue(meta) => match meta.path.get_ident() {
+                    Some(ident) if ident == "rename" => {
+                        if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
+                            if let Lit::Str(li) = lit {
+                                let s = li.value();
+                                table.extend(quote! {});
+                            }
+                        }
+                    }
+                    Some(ident) if ident == "color" => {
+                        if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
+                            if let Lit::Str(li) = lit {
+                                let s = li.token();
+                                table.extend(quote! {.color(#s)});
+                            }
+                        }
+                    }
+                    Some(ident) if ident == "bg" => {
+                        if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
+                            if let Lit::Str(li) = lit {
+                                let s = li.value();
+                                table.extend(quote! {.bg(#s)});
+                            }
+                        }
+                    }
+                    Some(ident) if ident == "font" => {
+                        if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
+                            if let Lit::Str(li) = lit {
+                                let s = li.value();
+                                let ident = Ident::new(&s, proc_macro2::Span::call_site());
+                                table.extend(quote! {.font(#ident)});
+                            }
+                        }
+                    }
+                    _ => {
+                        unimplemented!();
+                    }
+                },
+                _ => {
+                    unimplemented!();
+                }
             };
-            for nested_meta in meta_list.into_iter() {
-                let meta = match nested_meta {
-                    MetaList { tokens, .. } => Ok(tokens),
-                }?;
-
-            }
         }
     }
 
-    Ok(proc_macro2::TokenStream::new())
+    table
 }
