@@ -5,9 +5,9 @@ use rct::ToTable;
 struct Movies {
     #[table(rename = "ID", color = "#00ff00")]
     id: u32,
-    #[table(rename = "Title", bg = "#0000ff")]
+    #[table(rename = "Title", bg = "#ff0000")]
     title: String,
-    #[table(rename = "Price €", font = "Font::Italic")]
+    #[table(rename = "Price €", font = "Font::Bold")]
     price: f32,
 }
 
