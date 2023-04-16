@@ -5,7 +5,7 @@ use syn::{parse_quote, DeriveInput, GenericParam, Generics};
 use crate::{fields::Data, utils::new_generic};
 
 pub fn to_table(input: DeriveInput) -> syn::Result<TokenStream> {
-    let data = Data::new(&input);
+    let data = Data::new(&input)?;
     let struct_name = data.struct_name;
     let fields = data.get_field();
 

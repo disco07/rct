@@ -1,0 +1,8 @@
+error: rct derive macros can only supported structs
+ --> tests/ui/enum.rs:4:1
+  |
+4 | / enum Tests {
+5 | |     Value1,
+6 | |     Value2,
+7 | | }
+  | |_^

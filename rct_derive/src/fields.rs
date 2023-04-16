@@ -22,24 +22,36 @@ pub struct Field {
 }
 
 impl<'a> Data<'a> {
-    pub fn new(input: &'a DeriveInput) -> Self {
+    pub fn new(input: &'a DeriveInput) -> syn::Result<Self> {
         let struct_name = &input.ident;
         let fields = match &input.data {
             SynData::Struct(s) => match &s.fields {
                 Fields::Named(field_named) => &field_named.named,
-                Fields::Unnamed(_) => unimplemented!(),
-                Fields::Unit => unimplemented!(),
+                Fields::Unnamed(_) => return Err(syn::Error::new_spanned(
+                    input,
+                    "rct derive macros can only supported structs named",
+                )),
+                Fields::Unit => return Err(syn::Error::new_spanned(
+                    input,
+                    "rct derive macros can only supported structs named",
+                )),
             },
-            SynData::Enum(_) => unimplemented!(),
-            SynData::Union(_) => unimplemented!(),
+            SynData::Enum(_) => return Err(syn::Error::new_spanned(
+                input,
+                "rct derive macros can only supported structs",
+            )),
+            SynData::Union(_) => return Err(syn::Error::new_spanned(
+                input,
+                "rct derive macros can only supported structs",
+            )),
         };
 
         let fields = fields.into_iter().collect::<Vec<&SynField>>();
 
-        Self {
+        Ok(Self {
             fields,
             struct_name,
-        }
+        })
     }
 
     pub fn get_field(&self) -> Vec<Field> {
