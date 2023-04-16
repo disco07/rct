@@ -1,3 +1,8 @@
+//! Derive macro for `rct` crate.
+//!
+//!
+//! Please refer to <https://docs.rs/rct/> for how to set this up.
+
 mod fields;
 mod table;
 mod utils;

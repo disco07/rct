@@ -48,12 +48,26 @@
 //! ```
 //!
 //! ### Add styles
-//! <p align="center">
-//! <img src="https://raw.githubusercontent.com/disco07/rct/main/images/color_table.PNG" height="300" width="220" />
-//! </p>
+//! ```
+//! fn main() {
+//!     use rct::cell::ICell;
+//!     use rct::table::Table;
+//!     use rct::styles::color::{Colorizer, Font};
+//!
+//!     let mut table = Table::new();
+//!
+//!     table
+//!         .add_header(vec!["ID".cell(), "Title".cell(), "Price €".cell()])
+//!         .add_row(vec![1.cell(),"Harry \nPotter".cell().color("#ff0000"), "14.87".cell()])
+//!         .add_row(vec![2.cell(),"Spider-man".cell(),"18.80".cell()])
+//!         .add_row(vec![3.cell(), "Avenger".cell(), "18.50".cell().font(Font::Italic)]);
+//!     table.view();
+//! }
+//! ```
+//! ![Styled Table](../images/style_table.png)
 //!
 //! ### Use derive macro
-//! `#[derive(ToTable)]` can be used to display a `struct`, `Vec` or slice of `struct` as a table.
+//! `#[derive(ToTable)]` can be used to display a `Vec` or slice of `struct` as a table.
 //! ```rust
 //! use rct::ToTable;
 //!
@@ -80,10 +94,13 @@
 //!
 //!     let table = movies.into_iter().to_table();
 //!
-//!     println!("{}", table.to_string());
+//!     println!("{}", table);
 //! }
 //! ```
+//! 
+//! ## Features
 //!
+//! - `derive`: Enables derive macro for creating tables using structs.
 
 pub mod cell;
 pub mod row;
