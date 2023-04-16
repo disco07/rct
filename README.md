@@ -5,15 +5,18 @@
 # rct
 A CLI Table Output for Rust 🦀 projects.
 
+![Basic table](rct/images/basic.png)
+![Color table](rct/images/color_table.gif)
+
 ## Installation
 Add from command line.
 ```
-cargo add rct@0.1.3
+cargo install rct
 ```
 Or add this to your Cargo.toml file.
 ```
 [dependencies]
-rct = "0.1.4"
+rct = "0.1.5"
 
 # Or add from github main branch.
 rct = { git = "https://github.com/disco07/rct.git", branch = "main" }
@@ -70,12 +73,11 @@ fn main() {
     table.view()
 }
 ```
-![Basic table](images/basic.PNG)
 
 ### Customizing the table (add colors)
 ```rust
 use rct::cell::ICell;
-use rct::color::Colorizer;
+use rct::styles::color::{Colorizer, Font};
 use rct::table::Table;
 
 fn main() {
@@ -98,15 +100,18 @@ fn main() {
             "14.87".cell(),
             "€".cell(),
             "Harry Potter".cell(),
-            "2001-12-05 22:05:20".cell(),
+            "2001-12-05 22:05:20"
+                .cell()
+                .bg("#0000ff")
+                .font(Font::Blinking),
         ])
         .add_row(vec![
             2.cell(),
-            "Spider-man".cell(),
+            "Spider-man".cell().font(Font::Italic),
             "0".cell(),
-            "18.80".cell(),
+            "18.80".cell().font(Font::Bold),
             "€".cell(),
-            "Spider-man, No Way Home.".cell().color("#0000ff"),
+            "Spider-man, No Way Home.".cell().font(Font::Strikethrough),
             "2018-12-12 09:04:50".cell(),
         ])
         .add_row(vec![
@@ -121,8 +126,50 @@ fn main() {
 
     table.view();
 }
+
 ```
-![Color table](images/color_table.PNG)
+
+### Derive macro
+
+#[derive(ToTable)] can also be used to print a Vec or slice of structs as table.
+```rust
+use rct::styles::color::{Colorizer, Font};
+use rct::ToTable;
+
+#[derive(ToTable)]
+struct Movies<T, S> {
+    #[table(rename = "ID", color = "#00ff00")]
+    id: T,
+    #[table(rename = "Title", bg = "#ff0000")]
+    title: S,
+    #[table(rename = "Price €", font = "Font::Bold")]
+    price: f32,
+}
+
+fn main() {
+    let movies = [
+        Movies {
+            id: 1,
+            title: "Harry \nPotter".to_string(),
+            price: 14.87,
+        },
+        Movies {
+            id: 2,
+            title: "Spider-man".to_string(),
+            price: 18.80,
+        },
+    ];
+
+    let table = movies.into_iter().to_table();
+
+    println!("{}", table);
+}
+```
+#### Field attributes
+<li>rename: Used to rename a column. Usage: #[table(rename = "Name")]</li>
+<li>color: Used to specify color of contents of a column with hexadecimal value. Usage: #[table(color = "#00ff00")]</li>
+<li>font: Used to add style like bold, italic, ... to the column. Usage: #[table(font = "Font::Bold")]</li>
+
 
 ## Contributing 🤝
 Contributions, issues, and feature requests are welcome!

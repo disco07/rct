@@ -1,0 +1,8 @@
+error: rct derive macros can only supported structs
+ --> tests/ui/union.rs:4:1
+  |
+4 | / union Test {
+5 | |     price: f32,
+6 | |     price2: f32,
+7 | | }
+  | |_^

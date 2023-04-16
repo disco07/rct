@@ -1,0 +1,5 @@
+error: rct derive macros can only supported structs named
+ --> tests/ui/struct_unit.rs:4:1
+  |
+4 | struct Tests;
+  | ^^^^^^^^^^^^^
