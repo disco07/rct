@@ -71,8 +71,11 @@
 //!
 //! #[derive(ToTable)]
 //! struct Movies {
+//!     #[table(rename = "ID")]
 //!     id: u32,
+//!     #[table(rename = "Title")]
 //!     title: String,
+//!     #[table(rename = "Price €")]
 //!     price: f32,
 //! }
 //!
