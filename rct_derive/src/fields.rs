@@ -1,8 +1,11 @@
-use proc_macro2::{TokenStream, Span};
+use proc_macro2::{Span, TokenStream};
 use quote::ToTokens;
-use syn::spanned::Spanned;
-use syn::{LitStr, Expr, Field as SynField, Data as SynData, Result, Ident, Attribute, Meta, Token, ExprLit, Lit, Index, Fields, DeriveInput};
 use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
+use syn::{
+    Attribute, Data as SynData, DeriveInput, Expr, ExprLit, Field as SynField, Fields, Ident,
+    Index, Lit, LitStr, Meta, Result, Token,
+};
 
 pub struct Data<'a> {
     pub struct_name: &'a Ident,
@@ -15,7 +18,7 @@ pub struct Field {
     pub font: Option<Expr>,
     pub color: Option<LitStr>,
     pub bg: Option<LitStr>,
-    pub span: Option<Span>
+    pub span: Option<Span>,
 }
 
 impl<'a> Data<'a> {
@@ -31,7 +34,7 @@ impl<'a> Data<'a> {
             SynData::Union(_) => unimplemented!(),
         };
 
-        let fields = fields.into_iter().map(|f|f).collect::<Vec<&SynField>>();
+        let fields = fields.into_iter().collect::<Vec<&SynField>>();
 
         Self {
             fields,
@@ -40,9 +43,11 @@ impl<'a> Data<'a> {
     }
 
     pub fn get_field(&self) -> Vec<Field> {
-        self.fields.iter().enumerate().map(|(index, f)| {
-            Field::new(f, index).unwrap().unwrap()
-        }).collect()
+        self.fields
+            .iter()
+            .enumerate()
+            .map(|(index, f)| Field::new(f, index).unwrap().unwrap())
+            .collect()
     }
 }
 
@@ -84,9 +89,7 @@ fn get_fields(f: &SynField) -> Result<Field> {
                     Some(ident) if ident == "rename" => {
                         if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
                             field.name = Some(match lit {
-                                Lit::Str(lit_str) => {
-                                    lit_str
-                                },
+                                Lit::Str(lit_str) => lit_str,
                                 err => {
                                     return Err(syn::Error::new_spanned(
                                         err,
@@ -99,9 +102,7 @@ fn get_fields(f: &SynField) -> Result<Field> {
                     Some(ident) if ident == "color" => {
                         if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
                             field.color = Some(match lit {
-                                Lit::Str(lit_str) => {
-                                    lit_str
-                                },
+                                Lit::Str(lit_str) => lit_str,
                                 err => {
                                     return Err(syn::Error::new_spanned(
                                         err,
@@ -114,9 +115,7 @@ fn get_fields(f: &SynField) -> Result<Field> {
                     Some(ident) if ident == "bg" => {
                         if let Expr::Lit(ExprLit { lit, .. }) = meta.value {
                             field.bg = Some(match lit {
-                                Lit::Str(lit_str) => {
-                                    lit_str
-                                },
+                                Lit::Str(lit_str) => lit_str,
                                 err => {
                                     return Err(syn::Error::new_spanned(
                                         err,
@@ -129,9 +128,7 @@ fn get_fields(f: &SynField) -> Result<Field> {
                     Some(ident) if ident == "font" => {
                         if let Expr::Lit(ExprLit { lit, .. }) = &meta.value {
                             field.font = Some(match lit {
-                                Lit::Str(lit_str) => {
-                                    lit_str.parse::<Expr>()
-                                }
+                                Lit::Str(lit_str) => lit_str.parse::<Expr>(),
                                 err => {
                                     return Err(syn::Error::new_spanned(
                                         err,
@@ -141,15 +138,19 @@ fn get_fields(f: &SynField) -> Result<Field> {
                             }?)
                         }
                     }
-                    _ => return Err(syn::Error::new_spanned(
+                    _ => {
+                        return Err(syn::Error::new_spanned(
+                            meta,
+                            "Attributes should be of type: #[table(key = \"value\", ..)]",
+                        ))
+                    }
+                },
+                _ => {
+                    return Err(syn::Error::new_spanned(
                         meta,
                         "Attributes should be of type: #[table(key = \"value\", ..)]",
                     ))
-                },
-                _ => return Err(syn::Error::new_spanned(
-                    meta,
-                    "Attributes should be of type: #[table(key = \"value\", ..)]",
-                ))
+                }
             };
         }
     }

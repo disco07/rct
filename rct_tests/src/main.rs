@@ -27,5 +27,5 @@ fn main() {
 
     let table = movies.into_iter().to_table();
 
-    println!("{}", table.to_string());
+    println!("{}", table);
 }
