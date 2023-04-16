@@ -10,3 +10,5 @@ struct Tests<T, S> {
     #[table(rename = "Price €", font = "Bold")]
     price: f32,
 }
+
+fn main() {}
