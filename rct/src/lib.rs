@@ -19,7 +19,6 @@
 //!
 //! ### Basic usage
 //! ```rust
-//! fn main() {
 //!     use rct::cell::ICell;
 //!     use rct::table::Table;
 //!
@@ -31,7 +30,7 @@
 //!         .add_row(vec![2.cell(),"Spider-man".cell(),"18.80".cell()])
 //!         .add_row(vec![3.cell(), "Avenger".cell(), "18.50".cell()]);
 //!     table.view();
-//! }
+//!
 //! ```
 //!
 //! ```markdown
@@ -49,7 +48,6 @@
 //!
 //! ### Add styles
 //! ```
-//! fn main() {
 //!     use rct::cell::ICell;
 //!     use rct::table::Table;
 //!     use rct::styles::color::{Colorizer, Font};
@@ -62,13 +60,13 @@
 //!         .add_row(vec![2.cell(),"Spider-man".cell(),"18.80".cell()])
 //!         .add_row(vec![3.cell(), "Avenger".cell(), "18.50".cell().font(Font::Italic)]);
 //!     table.view();
-//! }
+//!
 //! ```
 //! ![Styled Table](../images/style_table.png)
 //!
 //! ### Use derive macro
 //! `#[derive(ToTable)]` can be used to display a `Vec` or slice of `struct` as a table.
-//! ```rust
+//! ```rust, no_run
 //! use rct::ToTable;
 //!
 //! #[derive(ToTable)]
@@ -78,7 +76,6 @@
 //!     price: f32,
 //! }
 //!
-//! fn main() {
 //!     let movies = [
 //!         Movies {
 //!             id: 1,
@@ -95,9 +92,9 @@
 //!     let table = movies.into_iter().to_table();
 //!
 //!     println!("{}", table);
-//! }
+//!
 //! ```
-//! 
+//!
 //! ## Features
 //!
 //! - `derive`: Enables derive macro for creating tables using structs.

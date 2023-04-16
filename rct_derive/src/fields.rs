@@ -27,23 +27,31 @@ impl<'a> Data<'a> {
         let fields = match &input.data {
             SynData::Struct(s) => match &s.fields {
                 Fields::Named(field_named) => &field_named.named,
-                Fields::Unnamed(_) => return Err(syn::Error::new_spanned(
-                    input,
-                    "rct derive macros can only supported structs named",
-                )),
-                Fields::Unit => return Err(syn::Error::new_spanned(
-                    input,
-                    "rct derive macros can only supported structs named",
-                )),
+                Fields::Unnamed(_) => {
+                    return Err(syn::Error::new_spanned(
+                        input,
+                        "rct derive macros can only supported structs named",
+                    ))
+                }
+                Fields::Unit => {
+                    return Err(syn::Error::new_spanned(
+                        input,
+                        "rct derive macros can only supported structs named",
+                    ))
+                }
             },
-            SynData::Enum(_) => return Err(syn::Error::new_spanned(
-                input,
-                "rct derive macros can only supported structs",
-            )),
-            SynData::Union(_) => return Err(syn::Error::new_spanned(
-                input,
-                "rct derive macros can only supported structs",
-            )),
+            SynData::Enum(_) => {
+                return Err(syn::Error::new_spanned(
+                    input,
+                    "rct derive macros can only supported structs",
+                ))
+            }
+            SynData::Union(_) => {
+                return Err(syn::Error::new_spanned(
+                    input,
+                    "rct derive macros can only supported structs",
+                ))
+            }
         };
 
         let fields = fields.into_iter().collect::<Vec<&SynField>>();
