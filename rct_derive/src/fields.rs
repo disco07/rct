@@ -4,9 +4,9 @@ use syn::spanned::Spanned;
 use syn::{LitStr, Expr, Field as SynField, Data as SynData, Result, Ident, Attribute, Meta, Token, ExprLit, Lit, Index, Fields, DeriveInput};
 use syn::punctuated::Punctuated;
 
-pub struct Data {
-    pub struct_name: Ident,
-    fields: Vec<SynField>,
+pub struct Data<'a> {
+    pub struct_name: &'a Ident,
+    fields: Vec<&'a SynField>,
 }
 
 pub struct Field {
@@ -18,12 +18,12 @@ pub struct Field {
     pub span: Option<Span>
 }
 
-impl Data {
-    pub fn new(input: DeriveInput) -> Self {
-        let struct_name = input.ident;
-        let fields = match input.data {
-            SynData::Struct(s) => match s.fields {
-                Fields::Named(field_named) => field_named.named,
+impl<'a> Data<'a> {
+    pub fn new(input: &'a DeriveInput) -> Self {
+        let struct_name = &input.ident;
+        let fields = match &input.data {
+            SynData::Struct(s) => match &s.fields {
+                Fields::Named(field_named) => &field_named.named,
                 Fields::Unnamed(_) => unimplemented!(),
                 Fields::Unit => unimplemented!(),
             },
@@ -31,7 +31,7 @@ impl Data {
             SynData::Union(_) => unimplemented!(),
         };
 
-        let fields = fields.into_iter().map(|f|f).collect::<Vec<SynField>>();
+        let fields = fields.into_iter().map(|f|f).collect::<Vec<&SynField>>();
 
         Self {
             fields,

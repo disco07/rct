@@ -2,11 +2,11 @@ use rct::styles::color::{Colorizer, Font};
 use rct::ToTable;
 
 #[derive(ToTable)]
-struct Movies {
+struct Movies<T, S> {
     #[table(rename = "ID", color = "#00ff00")]
-    id: u32,
+    id: T,
     #[table(rename = "Title", bg = "#ff0000")]
-    title: String,
+    title: S,
     #[table(rename = "Price €", font = "Font::Bold")]
     price: f32,
 }

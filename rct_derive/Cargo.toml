@@ -23,6 +23,7 @@ proc-macro = true
 syn = { version = "2.0.5", features = ["extra-traits"] }
 quote = "1.0.26"
 proc-macro2 = "1.0.53"
+rand = "0.8.4"
 
 [dev-dependencies]
 rct = { path = "../rct" }
