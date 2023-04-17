@@ -1,8 +1,9 @@
 use rct::ICell;
 use rct::Table;
+use rct::styles::borders::BorderStyle;
 
 fn main() {
-    let mut table = Table::new();
+    let mut table = Table::default();
 
     table
         .add_header(vec![
@@ -40,7 +41,7 @@ fn main() {
             "€".cell(),
             "Avenger".cell(),
             "2017-10-12 10:34:39".cell(),
-        ]);
+        ]).border(BorderStyle::Empty);
 
     table.view();
     println!("\n");

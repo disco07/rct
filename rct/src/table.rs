@@ -1,4 +1,4 @@
-use crate::row::Row;
+use crate::{row::Row, styles::borders::BorderStyle};
 use crate::styles::borders::Border;
 use crate::styles::color::split_colors;
 use std::fmt::{Display, Formatter};
@@ -86,6 +86,17 @@ impl Table {
     pub fn add_header<R: Into<Row>>(&mut self, row: R) -> &mut Table {
         let row = row.into();
         self.header = Some(row);
+
+        self
+    }
+
+    pub fn border(&mut self, border: BorderStyle) -> &mut Table {
+        let border = match border {
+            BorderStyle::Default => Border::default(),
+            BorderStyle::Simple => Border::simple(),
+            BorderStyle::Empty => Border::empty(),
+        };
+        self.border = border;
 
         self
     }
