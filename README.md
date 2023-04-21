@@ -168,6 +168,7 @@ fn main() {
 #### Field attributes
 <li>rename: Used to rename a column. Usage: #[table(rename = "Name")]</li>
 <li>color: Used to specify color of contents of a column with hexadecimal value. Usage: #[table(color = "#00ff00")]</li>
+<li>bg: Used to specify background color of contents of a column with hexadecimal value. Usage: #[table(bg = "#ff0000")]</li>
 <li>font: Used to add style like bold, italic, ... to the column. Usage: #[table(font = "Font::Bold")]</li>
 
 

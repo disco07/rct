@@ -17,6 +17,54 @@ pub struct Border {
     pub(crate) mid_mid: char,
 }
 
+pub enum BorderStyle {
+    Default,
+    Simple,
+    Empty,  
+}
+
+impl Border {
+    pub fn simple() -> Self {
+        Self {
+            top: '-',
+            top_mid: '+',
+            top_left: '+',
+            top_right: '+',
+            bottom: '-',
+            bottom_mid: '+',
+            bottom_left: '+',
+            bottom_right: '+',
+            left: '|',
+            left_mid: '+',
+            middle: '│',
+            right: '|',
+            right_mid: '+',
+            mid: '-',
+            mid_mid: '+',
+        }
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            top: ' ',
+            top_mid: ' ',
+            top_left: ' ',
+            top_right: ' ',
+            bottom: ' ',
+            bottom_mid: ' ',
+            bottom_left: ' ',
+            bottom_right: ' ',
+            left: ' ',
+            left_mid: ' ',
+            middle: ' ',
+            right: ' ',
+            right_mid: ' ',
+            mid: ' ',
+            mid_mid: ' ',
+        }
+    }
+}
+
 impl Default for Border {
     fn default() -> Self {
         Self {
