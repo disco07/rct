@@ -16,7 +16,7 @@ cargo install rct
 Or add this to your Cargo.toml file.
 ```
 [dependencies]
-rct = "0.1.5"
+rct = "0.2.0"
 
 # Or add from github main branch.
 rct = { git = "https://github.com/disco07/rct.git", branch = "main" }

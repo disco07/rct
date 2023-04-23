@@ -14,7 +14,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! rct = "0.1.5"
+//! rct = "0.2.0"
 //! ```
 //!
 //! ### Basic usage
