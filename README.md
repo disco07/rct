@@ -1,7 +1,7 @@
 # Rct &emsp; [![Build Status]][actions] [![Latest Version]][crates.io] [![Documentation]][Doc] [![codecov]][Cover]
 
 [Build Status]: https://github.com/disco07/rct/actions/workflows/build.yml/badge.svg?branch=main
-[actions]: https://github.com/disco07/rct/actions/workflows/rust.yml
+[actions]: https://github.com/disco07/rct/actions/workflows/build.yml
 [Latest Version]: https://img.shields.io/crates/v/rct.svg
 [crates.io]: https://crates.io/crates/rct
 [Documentation]: https://docs.rs/rct/badge.svg 
