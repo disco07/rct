@@ -1,8 +1,14 @@
-[![Rust](https://github.com/disco07/rct/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/disco07/rct/actions/workflows/rust.yml)
-[![Crates.io](https://img.shields.io/crates/v/rct.svg)](https://crates.io/crates/rct)
-[![Documentation](https://docs.rs/rct/badge.svg)](https://docs.rs/rct/)
-[![codecov](https://codecov.io/gh/disco07/rct/branch/main/graph/badge.svg)](https://codecov.io/gh/disco07/rct)
-# rct
+# Rct &emsp; [![Build Status]][actions] [![Latest Version]][crates.io] [![Documentation]][Doc] [![codecov]][Cover]
+
+[Build Status]: https://github.com/disco07/rct/actions/workflows/build.yml/badge.svg?branch=main
+[actions]: https://github.com/disco07/rct/actions/workflows/rust.yml
+[Latest Version]: https://img.shields.io/crates/v/rct.svg
+[crates.io]: https://crates.io/crates/rct
+[Documentation]: https://docs.rs/rct/badge.svg 
+[Doc]: https://docs.rs/rct/
+[codecov]: https://codecov.io/gh/disco07/rct/branch/main/graph/badge.svg
+[Cover]: https://codecov.io/gh/disco07/rct
+
 A CLI Table Output for Rust 🦀 projects.
 
 ![Basic table](rct/images/basic.png)
