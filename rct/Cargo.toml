@@ -1,6 +1,6 @@
 [package]
 name = "rct"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["disco07 <koneenok@outlook.fr>"]
 description = "CLI Table Output for Rust Project"
@@ -40,5 +40,5 @@ targets = ["x86_64-unknown-linux-gnu"]
 [features]
 default = ["derive"]
 
-# Provide derive(Table) macros.
+# Provide derive(ToTable) macros.
 derive = ["rct_derive"]
